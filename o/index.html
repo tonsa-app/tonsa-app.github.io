@@ -29,6 +29,12 @@ body{background:var(--ground);color:var(--ink);font:17px/1.6 "IBM Plex Sans Arab
 .ready .stub{background:var(--saffron);color:var(--sink)}
 .stub b{display:block;font-size:26px}
 .stub span{opacity:.88;font-size:15px}
+.track{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:340px;margin-top:18px}
+.track div{text-align:center;font-size:13px;color:var(--muted);font-weight:600}
+.track div::before{content:"";display:block;height:6px;border-radius:3px;background:rgba(127,127,127,.22);margin-bottom:6px;transition:background .4s}
+.track div.on::before{background:var(--red)}
+.track.ready div.on::before,.track.done div.on::before{background:var(--saffron)}
+.track div.now{color:var(--ink);font-weight:700}
 .cta{margin-top:22px;width:100%;max-width:340px;position:relative;z-index:1}
 button,.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;border:0;border-radius:18px;
  font-family:inherit;font-weight:700;font-size:17px;line-height:1;cursor:pointer;text-decoration:none}
@@ -49,6 +55,7 @@ footer a{color:inherit}
   <div class="stub"><div><b id="title">نجيب طلبك…</b><span id="sub">لحظة</span></div></div>
  </div>
 </main>
+<div class="track" id="track" role="img" aria-label="مرحلة طلبك"><div>استلمنا</div><div>نحضّره</div><div>جاهز</div><div>استلمته</div></div>
 <div class="cta">
  <div id="ios" hidden>
   <a class="btn primary" id="clip">افتح تذكرتك في Tonsa</a>
@@ -68,7 +75,7 @@ const VAPID='BNu1oHzNO_Ay89DhPQGeAoccyaw3_YXBEXqRVDyC_tP8pDBHDnWHKYw4cbpEUf9VCUY
 const id=new URLSearchParams(location.search).get('id')||'';
 const $=(x)=>document.getElementById(x);
 const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-const TXT={preparing:['طلبك يتجهز','بنرسل لك تنبيه أول ما يجهز'],ready:['طلبك جاهز 🎉','تفضل استلمه من الكاشير'],
+const TXT={received:['استلمنا طلبك','بنبدأ نجهزه الحين'],preparing:['طلبك يتجهز','بنرسل لك تنبيه أول ما يجهز'],ready:['طلبك جاهز 🎉','تفضل استلمه من الكاشير'],
  collected:['بالعافية!','شكرًا لزيارتك'],cancelled:['انلغى الطلب','كلّم الكاشير لو عندك سؤال']};
 let last=null;
 const rpc=(fn,body)=>fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify(body)}).then(r=>r.ok?r.json():null).catch(()=>null);
@@ -100,6 +107,10 @@ async function load(){
   theme(j.cafe&&j.cafe.theme||{}, j.logo);
   const t=TXT[j.status]||TXT.preparing; $('title').textContent=t[0]; $('sub').textContent=t[1];
   $('wrap').classList.toggle('ready',j.status==='ready');
+  const step={received:0,preparing:1,ready:2,collected:3}[j.status]??-1, names=['استلمنا','نحضّره','جاهز','استلمته'];
+  const tr=$('track'); tr.classList.toggle('ready',j.status==='ready'); tr.classList.toggle('done',j.status==='collected');
+  [...tr.children].forEach((d,i)=>{d.classList.toggle('on',i<=step);d.classList.toggle('now',i===step)});
+  tr.setAttribute('aria-label',step>=0?`مرحلة طلبك: ${names[step]}، ${step+1} من ٤`:'انلغى الطلب');
   if(last&&last!=='ready'&&j.status==='ready'){ chime(); navigator.vibrate&&navigator.vibrate([400,150,400]); }
   last=j.status;
 }
