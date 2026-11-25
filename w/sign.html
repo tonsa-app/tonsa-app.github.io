@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة الباركود — Tonsa</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+@page{size:A4;margin:0}
+*{box-sizing:border-box}body{margin:0;font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;background:#eee;color:#111}
+.sheet{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:22mm 18mm;display:flex;flex-direction:column;align-items:center;text-align:center}
+.name{font-size:34px;font-weight:700;margin:0}
+h1{font-size:64px;line-height:1.1;margin:14mm 0 4mm;color:var(--c,#E5303C)}
+p{font-size:24px;margin:0;color:#444}
+#qr{margin:12mm 0;padding:8mm;border:3mm solid var(--c,#E5303C);border-radius:12mm}
+#qr svg{display:block;width:110mm;height:110mm}
+.steps{display:flex;gap:8mm;font-size:20px;font-weight:700}
+.steps span{background:#f3f3f3;border-radius:8mm;padding:4mm 7mm}
+.pay{margin-top:10mm;font-size:22px}
+.foot{margin-top:auto;font-size:14px;color:#888}
+.print{position:fixed;bottom:16px;left:16px;font:inherit;font-weight:700;font-size:18px;padding:14px 22px;border:0;border-radius:14px;background:#111;color:#fff;cursor:pointer}
+@media print{body{background:#fff}.print{display:none}}
+</style></head><body>
+<div class="sheet">
+ <p class="name" id="name">…</p>
+ <h1>سجّل سيارتك<br>بدون انتظار</h1>
+ <p>صوّر الباركود بكاميرا جوالك</p>
+ <div id="qr"></div>
+ <div class="steps"><span>١ اكتب لوحتك</span><span>٢ اختر الخدمة</span><span>٣ نرسل لك لما تجهز</span></div>
+ <p class="pay">💵 الدفع عند السيارة</p>
+ <div class="foot">Tonsa · tonsa-app.github.io</div>
+</div>
+<button class="print" onclick="print()">🖨️ اطبع</button>
+<script>
+const code=(new URLSearchParams(location.search).get('c')||'').trim();
+const url='https://tonsa-app.github.io/w/?c='+encodeURIComponent(code);
+const q=qrcode(0,'M'); q.addData(url); q.make();
+document.getElementById('qr').innerHTML=q.createSvgTag({cellSize:8,margin:0,scalable:true});
+fetch('https://mqwtgwqyohrrvfjqwtgm.supabase.co/rest/v1/rpc/get_shop',{method:'POST',headers:{'Content-Type':'application/json',apikey:'sb_publishable_Dudu901qJs-L-_JqynRQ6Q_dYUVj0vX'},body:JSON.stringify({p_code:code})})
+ .then(r=>r.json()).then(j=>{ if(!j) return; document.getElementById('name').textContent=j.name;
+  if(/^#[0-9a-fA-F]{6}$/.test(j.theme&&j.theme.primary||'')) document.body.style.setProperty('--c',j.theme.primary); }).catch(()=>{});
+</script>
+</body></html>

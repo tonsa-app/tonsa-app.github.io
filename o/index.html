@@ -49,6 +49,16 @@ button,.btn{display:flex;align-items:center;justify-content:center;gap:8px;width
 .ok{color:#1E8E3E;font-weight:700}
 :focus-visible{outline:3px solid var(--saffron);outline-offset:3px}
 [hidden]{display:none!important}
+.mplate{direction:ltr;display:grid;grid-template-columns:1fr 1fr 34px;border:2.5px solid #111;border-radius:10px;overflow:hidden;background:#fff;color:#111;width:250px;margin:8px auto 0;font-variant-numeric:tabular-nums}
+.mplate .c{display:grid;grid-template-rows:1fr 1fr;border-right:2px solid #111;text-align:center}
+.mplate .c span{font-weight:700;font-size:26px;letter-spacing:3px;min-height:44px;display:grid;place-items:center}
+.mplate .c span+span{border-top:2px solid #111;font-family:ui-monospace,Menlo,monospace;font-size:22px}
+.mplate .k{background:#111;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center;text-align:center;line-height:1.2}
+.car{color:var(--muted);font-size:15px;margin-top:8px}
+.bill{position:relative;z-index:1;width:100%;max-width:340px;margin-top:16px;background:var(--paper);border-radius:22px;padding:14px 16px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.bill div{display:flex;justify-content:space-between;padding:4px 0;font-variant-numeric:tabular-nums}
+.bill .t{border-top:1px dashed rgba(127,127,127,.4);margin-top:6px;padding-top:8px;font-weight:800}
+.bill p{margin:6px 0 0;color:var(--muted);font-size:14px}
 footer{margin-top:auto;padding-top:26px;color:var(--muted);font-size:13px}
 footer a{color:inherit}
 </style></head><body>
@@ -61,6 +71,7 @@ footer a{color:inherit}
  </div>
 </main>
 <div class="track" id="track" role="img" aria-label="مرحلة طلبك"><div>استلمنا</div><div>نحضّره</div><div>جاهز</div><div>استلمته</div></div>
+<div class="bill" id="bill" hidden></div>
 <div class="rate hidden" id="rate">
   <div id="rateQ"><b>وش رأيك بطلبك؟</b><div class="faces">
     <button data-r="1" aria-label="تقييم 1 من 5">😞</button><button data-r="2" aria-label="تقييم 2 من 5">😕</button><button data-r="3" aria-label="تقييم 3 من 5">😐</button><button data-r="4" aria-label="تقييم 4 من 5">🙂</button><button data-r="5" aria-label="تقييم 5 من 5">😍</button></div></div>
@@ -92,7 +103,7 @@ const EN={'وش رأيك بطلبك؟':'How was your order?','⭐ قيّمنا �
 'طلبك جاهز 🎉':'Your order is ready 🎉','تفضل استلمه من الكاشير':'Please pick it up at the counter','بالعافية!':'Enjoy!','شكرًا لزيارتك':'Thanks for visiting',
 'انلغى الطلب':'Order cancelled','كلّم الكاشير لو عندك سؤال':'Ask the cashier if you have a question',
 'الرابط ناقص':'Incomplete link','امسح الكود عند الكاشير مرة ثانية':'Scan the code at the counter again','ما لقينا الطلب':'Order not found','تأكد من الكود عند الكاشير':'Check the code at the counter',
-'طلب ':'Order ','لحظة…':'One moment…','التنبيهات مقفلة. افتح إعدادات المتصفح واسمح بالتنبيهات لهذا الموقع.':'Notifications are blocked. Open your browser settings and allow notifications for this site.',
+'طلب ':'Order ','سيارتك':'Your car','استلمناها':'Received','نغسلها':'Washing','جاهزة':'Ready','استلمتها':'Picked up','استلمنا سيارتك':'We got your car','بنبدأ عليها الحين':'We\'ll start on it now','نغسل سيارتك 🧽':'Washing your car 🧽','بنرسل لك تنبيه أول ما تخلص':'We\'ll alert you as soon as it\'s done','سيارتك جاهزة 🚗✨':'Your car is ready 🚗✨','تفضل استلمها':'Come pick it up','الله يسلمك!':'Drive safe!','وش رأيك بالغسيل؟':'How was the wash?','المجموع':'Total','💵 الدفع عند السيارة':'💵 Pay at the car','ر.س':'SAR','انلغى الطلب ':'Order cancelled','لحظة…':'One moment…','التنبيهات مقفلة. افتح إعدادات المتصفح واسمح بالتنبيهات لهذا الموقع.':'Notifications are blocked. Open your browser settings and allow notifications for this site.',
 'ما قدرنا نفعّل التنبيه على هذا الجوال. خلّ الصفحة مفتوحة وبتسمع النداء.':'We couldn\'t turn on alerts on this phone. Keep this page open and you\'ll hear the call.',
 '🔔 جرّب مرة ثانية':'🔔 Try again','خلّ هذي الصفحة مفتوحة، وبتسمع النداء أول ما يجهز طلبك.':'Keep this page open and you\'ll hear the call when your order is ready.'};
 const T=(s)=>isAr?s:(EN[s]||s);
@@ -110,7 +121,7 @@ const $=(x)=>document.getElementById(x);
 const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const TXT={received:[T('استلمنا طلبك'),T('بنبدأ نجهزه الحين')],preparing:[T('طلبك يتجهز'),T('بنرسل لك تنبيه أول ما يجهز')],ready:[T('طلبك جاهز 🎉'),T('تفضل استلمه من الكاشير')],
  collected:[T('بالعافية!'),T('شكرًا لزيارتك')],cancelled:[T('انلغى الطلب'),T('كلّم الكاشير لو عندك سؤال')]};
-let last=null, started=Date.now(), rated=null, gurl=null;
+let washed=false, last=null, started=Date.now(), rated=null, gurl=null;
 const VIB=[90,60,90,60,90,140,600]; // اهتزاز Tonsa المميز
 const rpc=(fn,body)=>fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify(body)}).then(r=>r.ok?r.json():null).catch(()=>null);
 
@@ -141,11 +152,12 @@ async function load(){
     $('title').textContent=T('ما لقينا الطلب'); $('sub').textContent=T('تأكد من الكود عند الكاشير'); return;
   }
   $('num').textContent=String(j.number??'—');
+  if(j.kind==='carwash') wash(j);
   if(j.cafe&&j.cafe.name){ $('shop').textContent=j.cafe.name; document.title=T('طلب ')+j.number+' — '+j.cafe.name; }
   theme(j.cafe&&j.cafe.theme||{}, j.logo);
   const t=TXT[j.status]||TXT.preparing; $('title').textContent=t[0]; $('sub').textContent=t[1];
   $('wrap').classList.toggle('ready',j.status==='ready');
-  const step={received:0,preparing:1,ready:2,collected:3}[j.status]??-1, names=[T('استلمنا'),T('نحضّره'),T('جاهز'),T('استلمته')];
+  const step={received:0,preparing:1,ready:2,collected:3}[j.status]??-1, names=(washed?['استلمناها','نغسلها','جاهزة','استلمتها']:['استلمنا','نحضّره','جاهز','استلمته']).map(T);
   const tr=$('track'); tr.classList.toggle('ready',j.status==='ready'); tr.classList.toggle('done',j.status==='collected');
   [...tr.children].forEach((d,i)=>{d.classList.toggle('on',i<=step);d.classList.toggle('now',i===step)});
   tr.setAttribute('aria-label',step>=0?(isAr?`مرحلة طلبك: ${names[step]}، ${step+1} من ٤`:`Your order: ${names[step]}, ${step+1} of 4`):T('انلغى الطلب'));
@@ -155,6 +167,38 @@ async function load(){
   const canRate=j.status==='ready'||j.status==='collected';
   $('rate').classList.toggle('hidden',!canRate); showRated();
   last=j.status;
+}
+
+// المغاسل: نعرض اللوحة والخدمات بدل رقم الطلب
+const PL={'أ':'A','ب':'B','ح':'J','د':'D','ر':'R','س':'S','ص':'X','ط':'T','ع':'E','ق':'G','ك':'K','ل':'L','م':'Z','ن':'N','هـ':'H','و':'U','ى':'V'};
+const ARD='٠١٢٣٤٥٦٧٨٩', ard=s=>String(s).replace(/\d/g,d=>ARD[d]);
+const CN={white:['أبيض','White'],black:['أسود','Black'],silver:['فضي','Silver'],grey:['رمادي','Grey'],red:['أحمر','Red'],blue:['أزرق','Blue'],green:['أخضر','Green'],beige:['بيج','Beige'],brown:['بني','Brown'],gold:['ذهبي','Gold']};
+function wash(j){
+  if(!washed){
+    washed=true;
+    Object.assign(TXT,{received:[T('استلمنا سيارتك'),T('بنبدأ عليها الحين')],preparing:[T('نغسل سيارتك 🧽'),T('بنرسل لك تنبيه أول ما تخلص')],ready:[T('سيارتك جاهزة 🚗✨'),T('تفضل استلمها')],collected:[T('الله يسلمك!'),T('شكرًا لزيارتك')]});
+    [...$('track').children].forEach((d,i)=>d.textContent=T(['استلمناها','نغسلها','جاهزة','استلمتها'][i]));
+    $('rateQ').querySelector('b').textContent=T('وش رأيك بالغسيل؟');
+    document.querySelector('.top small').textContent=T('سيارتك');
+  }
+  const num=$('num'); num.textContent=''; num.style.fontSize='0';
+  const pl=document.createElement('div'); pl.className='mplate'; pl.setAttribute('role','img');
+  const lets=(j.plate_letters||'').split(' ').filter(Boolean);
+  const col=(a,b)=>{const c=document.createElement('div');c.className='c';const x=document.createElement('span');x.textContent=a;const y=document.createElement('span');y.textContent=b;c.append(x,y);return c;};
+  const k=document.createElement('div'); k.className='k'; k.textContent='KSA';
+  pl.append(col(ard(j.plate_num||j.number),j.plate_num||j.number),col(lets.join(' ')||'—',lets.map(l=>PL[l]||'').join(' ')||'—'),k);
+  pl.setAttribute('aria-label',T('سيارتك')+': '+lets.join(' ')+' '+(j.plate_num||j.number));
+  num.appendChild(pl);
+  const info=[j.car_color&&CN[j.car_color]?CN[j.car_color][isAr?0:1]:'',j.car_type||''].filter(Boolean).join(' · ');
+  if(info){const c=document.createElement('div');c.className='car';c.textContent=info;num.appendChild(c);}
+  const sv=Array.isArray(j.services)?j.services:[]; const bill=$('bill');
+  if(sv.length&&!bill.childElementCount){
+    const money=v=>isAr?`${ard(Number(v))} ${T('ر.س')}`:`${Number(v)} SAR`;
+    sv.forEach(x=>{const d=document.createElement('div');const a=document.createElement('span');a.textContent=x.name;const b=document.createElement('b');b.textContent=money(x.price);d.append(a,b);bill.appendChild(d);});
+    const t=document.createElement('div');t.className='t';const a=document.createElement('span');a.textContent=T('المجموع');const b=document.createElement('span');b.textContent=money(j.total||0);t.append(a,b);bill.appendChild(t);
+    const p=document.createElement('p');p.textContent=T('💵 الدفع عند السيارة');bill.appendChild(p);
+    bill.hidden=false;
+  }
 }
 
 function showRated(){

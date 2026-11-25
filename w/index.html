@@ -1,0 +1,203 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#E5303C">
+<title>سجّل سيارتك — Tonsa</title>
+<link rel="icon" href="/favicon.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--red:#E5303C;--saffron:#F5B82E;--sink:#1F1200;--ground:#F2F2F7;--paper:#fff;--ink:#1B1418;--muted:#6B6268;--line:rgba(127,127,127,.22)}
+@media (prefers-color-scheme:dark){:root{--ground:#111;--paper:#1F1B1D;--ink:#F6EFEC;--muted:#B5AAAE}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font:17px/1.55 "IBM Plex Sans Arabic",system-ui,sans-serif;
+ padding:calc(20px + env(safe-area-inset-top)) 18px calc(120px + env(safe-area-inset-bottom));max-width:480px;margin:0 auto}
+.shop{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px}
+.shop i{width:34px;height:34px;border-radius:50%;background:var(--red);display:grid;place-items:center;overflow:hidden;flex:none}
+.shop i img{width:100%;height:100%;object-fit:cover}
+h1{font-size:28px;line-height:1.25;margin:18px 0 4px}
+.lead{color:var(--muted);margin:0 0 18px}
+/* اللوحة: العنصر المميز للصفحة */
+.plate{direction:ltr;display:grid;grid-template-columns:1fr 1fr 46px;background:#fff;color:#111;border:3px solid #111;border-radius:14px;
+ overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.14);max-width:360px;margin:0 auto;font-variant-numeric:tabular-nums}
+.plate .c{display:grid;grid-template-rows:1fr 1fr;text-align:center;border-right:2px solid #111}
+.plate .c span{display:grid;place-items:center;font-weight:700;font-size:30px;letter-spacing:4px;min-height:52px;padding:0 6px}
+.plate .c span+span{border-top:2px solid #111;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:26px}
+.plate .c span.ph{color:#c9c9c9}
+.plate .k{background:#111;color:#fff;display:grid;place-items:center;text-align:center;font-size:11px;font-weight:700;line-height:1.2;padding:4px 2px}
+.plate .k b{font-size:13px;letter-spacing:1px}
+.card{background:var(--paper);border-radius:22px;padding:16px;margin-top:16px;box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.card h2{font-size:17px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline}
+.card h2 small{color:var(--muted);font-weight:600;font-size:14px}
+input[type=text],input[type=tel]{width:100%;min-height:54px;border-radius:14px;border:1.5px solid var(--line);background:transparent;color:var(--ink);
+ font:inherit;font-size:22px;font-weight:700;padding:0 14px;text-align:center;letter-spacing:6px;direction:ltr}
+input.soft{font-size:17px;letter-spacing:0;font-weight:600;text-align:start;direction:rtl}
+input:focus{outline:none;border-color:var(--red)}
+.keys{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
+.keys button{min-height:48px;border:0;border-radius:12px;background:rgba(127,127,127,.12);color:var(--ink);font:inherit;font-size:20px;font-weight:700;cursor:pointer;line-height:1.1}
+.keys button small{display:block;font-size:11px;color:var(--muted);font-weight:600}
+.keys button.del{background:rgba(229,48,60,.12);color:var(--red);font-size:17px}
+.keys button:active{transform:scale(.95)}
+.colors{display:flex;flex-wrap:wrap;gap:10px}
+.colors button{width:52px;height:52px;border-radius:50%;border:3px solid transparent;cursor:pointer;position:relative;box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.12)}
+.colors button[aria-pressed=true]{border-color:var(--red);box-shadow:inset 0 0 0 3px var(--paper)}
+.colors button[aria-pressed=true]::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff}
+.colors button.lt[aria-pressed=true]::after{color:#111}
+.cname{color:var(--muted);font-size:14px;margin-top:8px;min-height:22px}
+.svc{display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 4px;border-top:1px solid var(--line);cursor:pointer}
+.svc:first-of-type{border-top:0}
+.svc input{width:24px;height:24px;accent-color:var(--red);flex:none}
+.svc span{flex:1;font-weight:600}
+.svc b{font-variant-numeric:tabular-nums}
+.bar{position:fixed;inset:auto 0 0 0;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+ border-top:1px solid var(--line);padding:12px 18px calc(12px + env(safe-area-inset-bottom))}
+.bar .in{max-width:480px;margin:0 auto;display:flex;gap:12px;align-items:center}
+.total{min-width:96px}.total small{display:block;color:var(--muted);font-size:13px}.total b{font-size:20px;font-variant-numeric:tabular-nums}
+.go{flex:1;min-height:56px;border:0;border-radius:18px;background:var(--red);color:#fff;font:inherit;font-weight:700;font-size:18px;cursor:pointer}
+.go:disabled{opacity:.45;cursor:default}
+.pay{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:14px;margin-top:12px}
+.err{color:var(--red);font-weight:700;text-align:center;min-height:24px;margin-top:10px}
+.msg{text-align:center;margin-top:60px}.msg b{display:block;font-size:22px;margin-bottom:6px}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:3px}
+[hidden]{display:none!important}
+</style></head><body>
+<div class="shop"><i aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11v6a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1zm2.2-1h9.6l-1-3H8.2zM7.5 14a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4zm9 0a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4z"/></svg></i><span id="shop">Tonsa</span></div>
+
+<div id="loading" class="msg"><b>لحظة…</b></div>
+<div id="bad" class="msg" hidden><b id="badT">الرابط ناقص</b><span id="badS">امسح الباركود اللي عند المغسلة مرة ثانية</span></div>
+
+<form id="f" hidden autocomplete="off">
+ <h1>سجّل سيارتك</h1>
+ <p class="lead">اكتب لوحتك، اختر الخدمة، وانتظر بسيارتك أو بالجوال. نرسل لك أول ما تخلص.</p>
+
+ <div class="plate" id="plate" role="img" aria-label="لوحة سيارتك">
+  <div class="c"><span id="pArDigits" class="ph">٠٠٠٠</span><span id="pDigits" class="ph">0000</span></div>
+  <div class="c"><span id="pArLetters" class="ph">ـ ـ ـ</span><span id="pLetters" class="ph">- - -</span></div>
+  <div class="k"><div>السعودية<br><b>KSA</b></div></div>
+ </div>
+
+ <section class="card">
+  <h2>أرقام اللوحة <small>١ إلى ٤ أرقام</small></h2>
+  <input type="text" id="num" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="1234" aria-label="أرقام اللوحة">
+ </section>
+
+ <section class="card">
+  <h2>حروف اللوحة <small id="lcount">٠ من ٣</small></h2>
+  <div class="keys" id="keys"></div>
+ </section>
+
+ <section class="card">
+  <h2>لون السيارة</h2>
+  <div class="colors" id="colors"></div>
+  <div class="cname" id="cname"></div>
+  <input type="text" id="type" class="soft" maxlength="30" placeholder="نوع السيارة (مثلاً: كامري) — اختياري" aria-label="نوع السيارة" style="margin-top:6px">
+ </section>
+
+ <section class="card" id="svcCard">
+  <h2>الخدمات</h2>
+  <div id="svcs"></div>
+  <div class="pay">💵 <span>الدفع عند السيارة لما تخلص</span></div>
+ </section>
+
+ <section class="card">
+  <h2>رقم جوالك <small>اختياري</small></h2>
+  <input type="tel" id="phone" class="soft" inputmode="tel" maxlength="15" placeholder="05xxxxxxxx" aria-label="رقم جوالك" style="direction:ltr;text-align:center">
+ </section>
+ <div class="err" id="err" role="alert"></div>
+</form>
+
+<div class="bar" id="bar" hidden><div class="in">
+ <div class="total"><small>المجموع</small><b id="total">٠ ر.س</b></div>
+ <button class="go" id="go" form="f" type="submit" disabled>سجّل سيارتي</button>
+</div></div>
+
+<script>
+{
+const isAr=(navigator.languages&&navigator.languages[0]||navigator.language||'ar').toLowerCase().startsWith('ar');
+const EN={'سجّل سيارتك — Tonsa':'Register your car — Tonsa','سجّل سيارتك':'Register your car','اكتب لوحتك، اختر الخدمة، وانتظر بسيارتك أو بالجوال. نرسل لك أول ما تخلص.':'Enter your plate, pick a service, and wait. We\'ll alert you as soon as it\'s done.',
+'أرقام اللوحة':'Plate numbers','١ إلى ٤ أرقام':'1 to 4 digits','حروف اللوحة':'Plate letters','لون السيارة':'Car colour','الخدمات':'Services','💵':'💵','الدفع عند السيارة لما تخلص':'Pay at the car when it\'s done',
+'رقم جوالك':'Your phone','اختياري':'optional','المجموع':'Total','سجّل سيارتي':'Register my car','لحظة…':'One moment…','الرابط ناقص':'Incomplete link','امسح الباركود اللي عند المغسلة مرة ثانية':'Scan the code at the car wash again',
+'ما لقينا المغسلة':'Car wash not found','المغسلة موقفة الطلبات الحين':'This car wash isn\'t taking orders right now','كلّم الموظف عند المغسلة':'Please talk to the staff',
+'اكتب أرقام اللوحة':'Enter the plate numbers','اختر خدمة وحدة على الأقل':'Pick at least one service','ما قدرنا نسجّل، جرّب مرة ثانية':'Couldn\'t register, please try again','نوع السيارة (مثلاً: كامري) — اختياري':'Car model (e.g. Camry) — optional',
+'لوحة سيارتك':'Your plate','أرقام اللوحة ':'Plate numbers'};
+const T=s=>isAr?s:(EN[s]||s);
+if(!isAr){document.documentElement.lang='en';document.documentElement.dir='ltr';document.title=T(document.title);
+ const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);for(let n;(n=w.nextNode());){const k=n.nodeValue.trim();if(k&&EN[k])n.nodeValue=n.nodeValue.replace(k,EN[k]);}
+ document.querySelectorAll('[placeholder],[aria-label]').forEach(e=>{['placeholder','aria-label'].forEach(a=>{const v=e.getAttribute(a);if(v&&EN[v])e.setAttribute(a,EN[v])})});}
+
+const SB='https://mqwtgwqyohrrvfjqwtgm.supabase.co', KEY='sb_publishable_Dudu901qJs-L-_JqynRQ6Q_dYUVj0vX';
+const code=(new URLSearchParams(location.search).get('c')||'').trim();
+const $=x=>document.getElementById(x);
+const rpc=(fn,body)=>fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify(body)}).then(r=>r.ok?r.json():null).catch(()=>null);
+// حروف اللوحات السعودية ومقابلها الإنقليزي
+const LET=[['أ','A'],['ب','B'],['ح','J'],['د','D'],['ر','R'],['س','S'],['ص','X'],['ط','T'],['ع','E'],['ق','G'],['ك','K'],['ل','L'],['م','Z'],['ن','N'],['هـ','H'],['و','U'],['ى','V']];
+const AR_DIG='٠١٢٣٤٥٦٧٨٩', ar=s=>String(s).replace(/\d/g,d=>AR_DIG[d]);
+const COLORS=[['white','أبيض','White','#FFFFFF'],['black','أسود','Black','#111111'],['silver','فضي','Silver','#C0C4CA'],['grey','رمادي','Grey','#6E7378'],['red','أحمر','Red','#C8202B'],
+ ['blue','أزرق','Blue','#1F4FB8'],['green','أخضر','Green','#1F7A45'],['beige','بيج','Beige','#D8C7A4'],['brown','بني','Brown','#6B4325'],['gold','ذهبي','Gold','#C9A040']];
+let letters=[], color='', services=[], picked=new Set();
+
+function renderPlate(){
+  const n=$('num').value.replace(/\D/g,'');
+  $('pArDigits').textContent=n?ar(n):'٠٠٠٠'; $('pDigits').textContent=n||'0000';
+  $('pArDigits').classList.toggle('ph',!n); $('pDigits').classList.toggle('ph',!n);
+  $('pArLetters').textContent=letters.length?letters.map(l=>l[0]).join(' '):'ـ ـ ـ';
+  $('pLetters').textContent=letters.length?letters.map(l=>l[1]).join(' '):'- - -';
+  $('pArLetters').classList.toggle('ph',!letters.length); $('pLetters').classList.toggle('ph',!letters.length);
+  $('lcount').textContent=isAr?`${ar(letters.length)} من ٣`:`${letters.length} of 3`;
+  $('plate').setAttribute('aria-label',(isAr?'لوحة سيارتك: ':'Your plate: ')+letters.map(l=>l[0]).join(' ')+' '+n);
+  check();
+}
+function check(){
+  const ok=/^\d{1,4}$/.test($('num').value) && (!services.length || picked.size>0);
+  $('go').disabled=!ok;
+  const tot=services.filter(s=>picked.has(s.id)).reduce((a,s)=>a+Number(s.price),0);
+  $('total').textContent=isAr?`${ar(tot)} ر.س`:`${tot} SAR`;
+}
+function build(){
+  const k=$('keys');
+  LET.forEach(l=>{const b=document.createElement('button');b.type='button';b.innerHTML=`${l[0]}<small>${l[1]}</small>`;b.setAttribute('aria-label',l[0]+' '+l[1]);
+    b.onclick=()=>{if(letters.length<3){letters.push(l);renderPlate();navigator.vibrate&&navigator.vibrate(8);}};k.appendChild(b);});
+  const d=document.createElement('button');d.type='button';d.className='del';d.textContent='⌫';d.setAttribute('aria-label',isAr?'امسح حرف':'Delete letter');
+  d.onclick=()=>{letters.pop();renderPlate();};k.appendChild(d);
+  const c=$('colors');
+  COLORS.forEach(x=>{const b=document.createElement('button');b.type='button';b.style.background=x[3];if(['white','silver','beige'].includes(x[0]))b.className='lt';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',isAr?x[1]:x[2]);
+    b.onclick=()=>{color=x[0];c.querySelectorAll('button').forEach(o=>o.setAttribute('aria-pressed',String(o===b)));$('cname').textContent=isAr?x[1]:x[2];};c.appendChild(b);});
+  $('num').addEventListener('input',e=>{e.target.value=e.target.value.replace(/[٠-٩]/g,d=>AR_DIG.indexOf(d)).replace(/\D/g,'').slice(0,4);renderPlate();});
+}
+function renderServices(){
+  const box=$('svcs'); box.textContent='';
+  if(!services.length){$('svcCard').hidden=true;return;}
+  services.forEach((s,i)=>{const l=document.createElement('label');l.className='svc';
+    const cb=document.createElement('input');cb.type='checkbox';cb.onchange=()=>{cb.checked?picked.add(s.id):picked.delete(s.id);check();};
+    if(i===0){cb.checked=true;picked.add(s.id);}
+    const n=document.createElement('span');n.textContent=s.name;
+    const p=document.createElement('b');p.textContent=isAr?`${ar(Number(s.price))} ر.س`:`${Number(s.price)} SAR`;
+    l.append(cb,n,p);box.appendChild(l);});
+}
+function fail(t,s){$('loading').hidden=true;$('f').hidden=true;$('bar').hidden=true;$('bad').hidden=false;$('badT').textContent=T(t);$('badS').textContent=T(s);}
+const HEX=/^#[0-9a-fA-F]{6}$/;
+async function init(){
+  if(!code) return fail('الرابط ناقص','امسح الباركود اللي عند المغسلة مرة ثانية');
+  const j=await rpc('get_shop',{p_code:code});
+  if(!j||j.type!=='carwash') return fail('ما لقينا المغسلة','امسح الباركود اللي عند المغسلة مرة ثانية');
+  if(!j.active) return fail('المغسلة موقفة الطلبات الحين','كلّم الموظف عند المغسلة');
+  $('shop').textContent=j.name; document.title=j.name+' — '+T('سجّل سيارتك');
+  const t=j.theme||{}; if(HEX.test(t.primary||'')){document.documentElement.style.setProperty('--red',t.primary);document.querySelector('meta[name=theme-color]').content=t.primary;}
+  if(typeof j.logo==='string'&&/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(j.logo)){const i=document.querySelector('.shop i');i.textContent='';const im=document.createElement('img');im.src=j.logo;im.alt='';i.appendChild(im);}
+  services=j.services||[]; build(); renderServices(); renderPlate();
+  $('loading').hidden=true; $('f').hidden=false; $('bar').hidden=false;
+}
+$('f').addEventListener('submit',async e=>{
+  e.preventDefault(); $('err').textContent='';
+  if(!/^\d{1,4}$/.test($('num').value)){$('err').textContent=T('اكتب أرقام اللوحة');return;}
+  if(services.length&&!picked.size){$('err').textContent=T('اختر خدمة وحدة على الأقل');return;}
+  const go=$('go'); go.disabled=true; go.textContent=T('لحظة…');
+  const r=await rpc('create_car_order',{p_code:code,p_plate_num:$('num').value,p_plate_letters:letters.map(l=>l[0]).join(' '),p_color:color,
+    p_type:$('type').value.trim(),p_phone:$('phone').value.trim(),p_services:[...picked],p_lang:isAr?'ar':'en'});
+  if(r&&r.id){ try{localStorage.setItem('tonsa-car-'+code,r.id)}catch(_){} location.href='/o/?id='+r.id; return; }
+  if(r&&r.error==='inactive') return fail('المغسلة موقفة الطلبات الحين','كلّم الموظف عند المغسلة');
+  $('err').textContent=T(r&&r.error==='plate'?'اكتب أرقام اللوحة':'ما قدرنا نسجّل، جرّب مرة ثانية'); go.disabled=false; go.textContent=T('سجّل سيارتي');
+});
+init();
+}
+</script>
+</body></html>
