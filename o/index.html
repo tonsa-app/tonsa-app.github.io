@@ -1,0 +1,121 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#E5303C">
+<meta name="apple-itunes-app" content="app-id=6838883741, app-clip-bundle-id=sa.digitalinsights.tonsa.Clip, app-clip-display=card">
+<title>تذكرة طلبك — Tonsa</title>
+<link rel="icon" href="/favicon.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--red:#E5303C;--saffron:#F5B82E;--sink:#2B1A00;--ground:#F2F2F7;--paper:#fff;--ink:#1B1418;--muted:#6B6268}
+@media (prefers-color-scheme:dark){:root{--ground:#111;--paper:#1F1B1D;--ink:#F6EFEC;--muted:#B5AAAE}}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden;width:100%}
+body{background:var(--ground);color:var(--ink);font:17px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif;
+ display:flex;flex-direction:column;align-items:center;padding:calc(28px + env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom));overflow-x:hidden}
+.shop{font-weight:700;display:flex;gap:8px;align-items:center;margin-bottom:18px;position:relative;z-index:1}
+.shop i{width:26px;height:26px;border-radius:50%;background:var(--red);display:grid;place-items:center}
+.wrap{position:relative;width:100%;max-width:340px}
+.rings{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none}
+.rings span{position:absolute;inset:50% auto auto 50%;border-radius:50%;border:14px solid var(--red);opacity:.08;transform:translate(-50%,-50%);animation:p 1.8s ease-in-out infinite alternate}
+.ready .rings span{border-color:var(--saffron);opacity:.18}
+@keyframes p{to{transform:translate(-50%,-50%) scale(1.07)}}
+@media (prefers-reduced-motion:reduce){.rings span{animation:none}}
+.ticket{position:relative;border-radius:30px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.14);
+ -webkit-mask:radial-gradient(circle 16px at 0 290px,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 16px at 100% 290px,#0000 98%,#000) right/51% 100% no-repeat}
+.top{background:var(--paper);height:290px;display:grid;place-items:center;text-align:center;border-bottom:2px dashed rgba(127,127,127,.4)}
+.top small{color:var(--muted);font-weight:600;font-size:17px}
+.num{font-size:96px;font-weight:700;line-height:1.05;color:var(--red);font-variant-numeric:tabular-nums}
+.stub{background:var(--red);color:#fff;min-height:150px;display:grid;place-items:center;text-align:center;padding:18px;transition:background .5s}
+.ready .stub{background:var(--saffron);color:var(--sink)}
+.stub b{display:block;font-size:26px}
+.stub span{opacity:.88;font-size:15px}
+.cta{margin-top:22px;width:100%;max-width:340px;position:relative;z-index:1}
+button,.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;border:0;border-radius:18px;
+ font-family:inherit;font-weight:700;font-size:17px;line-height:1;cursor:pointer;text-decoration:none}
+.primary{background:var(--red);color:#fff}
+.ghost{background:transparent;color:var(--muted);font-weight:600;margin-top:6px}
+.note{color:var(--muted);text-align:center;font-size:15px;margin:12px 0 0}
+.ok{color:#1E8E3E;font-weight:700}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:3px}
+[hidden]{display:none!important}
+footer{margin-top:auto;padding-top:26px;color:var(--muted);font-size:13px}
+footer a{color:inherit}
+</style></head><body>
+<div class="shop"><i aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6zm0 19a2.5 2.5 0 0 0 2.4-2h-4.8A2.5 2.5 0 0 0 12 22z"/></svg></i><span id="shop">Tonsa</span></div>
+<main class="wrap" id="wrap">
+ <div class="rings" aria-hidden="true"><span style="width:340px;height:340px"></span><span style="width:450px;height:450px"></span><span style="width:560px;height:560px"></span></div>
+ <div class="ticket" role="status" aria-live="polite">
+  <div class="top"><div><small>رقم طلبك</small><div class="num" id="num">…</div></div></div>
+  <div class="stub"><div><b id="title">نجيب طلبك…</b><span id="sub">لحظة</span></div></div>
+ </div>
+</main>
+<div class="cta">
+ <div id="ios" hidden>
+  <a class="btn primary" id="clip">افتح تذكرتك في Tonsa</a>
+  <p class="note">يفتح بدون تحميل، ونناديك حتى لو جوالك مقفل.</p>
+ </div>
+ <div id="android" hidden>
+  <button class="primary" id="notify">🔔 فعّل التنبيه</button>
+  <p class="note" id="nnote">اضغط مرة وحدة، ونرسل لك تنبيه أول ما يجهز طلبك حتى لو جوالك مقفل.</p>
+ </div>
+ <p class="note ok" id="on" hidden>✓ التنبيه مفعّل. تقدر تقفل جوالك الحين.</p>
+</div>
+<footer>Tonsa · <a href="/">رؤى الرقمية</a></footer>
+<script>
+{
+const SB='https://mqwtgwqyohrrvfjqwtgm.supabase.co', KEY='sb_publishable_Dudu901qJs-L-_JqynRQ6Q_dYUVj0vX';
+const VAPID='BNu1oHzNO_Ay89DhPQGeAoccyaw3_YXBEXqRVDyC_tP8pDBHDnWHKYw4cbpEUf9VCUYtrjTDfplOLxhE5eYbHtk';
+const id=new URLSearchParams(location.search).get('id')||'';
+const $=(x)=>document.getElementById(x);
+const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const TXT={preparing:['طلبك يتجهز','بنرسل لك تنبيه أول ما يجهز'],ready:['طلبك جاهز 🎉','تفضل استلمه من الكاشير'],
+ collected:['بالعافية!','شكرًا لزيارتك'],cancelled:['انلغى الطلب','كلّم الكاشير لو عندك سؤال']};
+let last=null;
+const rpc=(fn,body)=>fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify(body)}).then(r=>r.ok?r.json():null).catch(()=>null);
+
+function chime(){try{const a=new (window.AudioContext||window.webkitAudioContext)();[0,.18,.36].forEach((t,i)=>{const o=a.createOscillator(),g=a.createGain();o.frequency.value=[880,1175,1568][i];g.gain.setValueAtTime(.0001,a.currentTime+t);g.gain.exponentialRampToValueAtTime(.3,a.currentTime+t+.02);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t+.5);o.connect(g).connect(a.destination);o.start(a.currentTime+t);o.stop(a.currentTime+t+.55)})}catch(e){}}
+
+async function load(){
+  if(!/^[0-9a-f-]{36}$/i.test(id)){ $('num').textContent='—'; $('title').textContent='الرابط ناقص'; $('sub').textContent='امسح الكود عند الكاشير مرة ثانية'; return; }
+  const j=await rpc('get_order',{p_id:id});
+  if(!j){ $('title').textContent='ما لقينا الطلب'; $('sub').textContent='تأكد من الكود عند الكاشير'; return; }
+  $('num').textContent=String(j.number??'—');
+  if(j.cafe&&j.cafe.name){ $('shop').textContent=j.cafe.name; document.title='طلب '+j.number+' — '+j.cafe.name; }
+  const t=TXT[j.status]||TXT.preparing; $('title').textContent=t[0]; $('sub').textContent=t[1];
+  $('wrap').classList.toggle('ready',j.status==='ready');
+  if(last&&last!=='ready'&&j.status==='ready'){ chime(); navigator.vibrate&&navigator.vibrate([400,150,400]); }
+  last=j.status;
+}
+
+function b64(s){s=s.replace(/-/g,'+').replace(/_/g,'/');const p='='.repeat((4-s.length%4)%4);const r=atob(s+p);return Uint8Array.from(r,c=>c.charCodeAt(0))}
+async function enable(){
+  const btn=$('notify'); btn.disabled=true; btn.textContent='لحظة…';
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){ $('nnote').textContent='التنبيهات مقفلة. افتح إعدادات المتصفح واسمح بالتنبيهات لهذا الموقع.'; btn.disabled=false; btn.textContent='🔔 فعّل التنبيه'; return; }
+    const reg=await navigator.serviceWorker.register('/sw.js',{scope:'/'}); await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(VAPID)});
+    const k=sub.toJSON();
+    const ok=await rpc('register_web_push',{p_id:id,p_endpoint:k.endpoint,p_p256dh:k.keys.p256dh,p_auth:k.keys.auth});
+    if(ok===false) throw new Error('reg');
+    try{localStorage.setItem('tonsa-on-'+id,'1')}catch(e){}
+    $('android').hidden=true; $('on').hidden=false; chime();
+  }catch(e){ $('nnote').textContent='ما قدرنا نفعّل التنبيه على هذا الجوال. خلّ الصفحة مفتوحة وبتسمع النداء.'; btn.disabled=false; btn.textContent='🔔 جرّب مرة ثانية'; }
+}
+
+if(isIOS){
+  $('ios').hidden=false;
+  $('clip').href='https://appclip.apple.com/id?p=sa.digitalinsights.tonsa.Clip&id='+encodeURIComponent(id);
+}else if('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window){
+  let on=false; try{on=localStorage.getItem('tonsa-on-'+id)==='1'}catch(e){}
+  if(on&&Notification.permission==='granted'){ $('on').hidden=false; navigator.serviceWorker.register('/sw.js',{scope:'/'}); }
+  else { $('android').hidden=false; $('notify').addEventListener('click',enable); }
+}else{
+  $('on').hidden=false; $('on').className='note'; $('on').textContent='خلّ هذي الصفحة مفتوحة، وبتسمع النداء أول ما يجهز طلبك.';
+}
+load(); setInterval(load,5000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) load(); });
+}
+</script>
+</body></html>
