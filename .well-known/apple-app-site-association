@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      { "appIDs": ["NPQXNLRCQ8.sa.digitalinsights.tonsa"], "components": [ { "/": "/o*" } ] }
+    ]
+  },
+  "appclips": {
+    "apps": ["NPQXNLRCQ8.sa.digitalinsights.tonsa.Clip"]
+  }
+}
