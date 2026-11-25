@@ -70,13 +70,35 @@ footer a{color:inherit}
 <footer>Tonsa · <a href="/">رؤى الرقمية</a></footer>
 <script>
 {
+// اللغة: عربي لو الجوال عربي، وإلا إنقليزي
+const isAr=(navigator.languages&&navigator.languages[0]||navigator.language||'ar').toLowerCase().startsWith('ar');
+const EN={'تذكرة طلبك — Tonsa':'Your order ticket — Tonsa','رقم طلبك':'Your order','نجيب طلبك…':'Loading your order…','لحظة':'One moment',
+'افتح تذكرتك في Tonsa':'Open your ticket in Tonsa','يفتح بدون تحميل، ونناديك حتى لو جوالك مقفل.':'Opens without downloading, and we call you even if your phone is locked.',
+'🔔 فعّل التنبيه':'🔔 Turn on alerts','اضغط مرة وحدة، ونرسل لك تنبيه أول ما يجهز طلبك حتى لو جوالك مقفل.':'Tap once and we\'ll alert you as soon as your order is ready, even if your phone is locked.',
+'✓ التنبيه مفعّل. تقدر تقفل جوالك الحين.':'✓ Alerts are on. You can lock your phone now.','رؤى الرقمية':'Digital Insights',
+'استلمنا':'Received','نحضّره':'Preparing','جاهز':'Ready','استلمته':'Picked up','مرحلة طلبك':'Your order stage',
+'استلمنا طلبك':'We got your order','بنبدأ نجهزه الحين':'We\'ll start preparing it now','طلبك يتجهز':'Your order is being prepared','بنرسل لك تنبيه أول ما يجهز':'We\'ll alert you as soon as it\'s ready',
+'طلبك جاهز 🎉':'Your order is ready 🎉','تفضل استلمه من الكاشير':'Please pick it up at the counter','بالعافية!':'Enjoy!','شكرًا لزيارتك':'Thanks for visiting',
+'انلغى الطلب':'Order cancelled','كلّم الكاشير لو عندك سؤال':'Ask the cashier if you have a question',
+'الرابط ناقص':'Incomplete link','امسح الكود عند الكاشير مرة ثانية':'Scan the code at the counter again','ما لقينا الطلب':'Order not found','تأكد من الكود عند الكاشير':'Check the code at the counter',
+'طلب ':'Order ','لحظة…':'One moment…','التنبيهات مقفلة. افتح إعدادات المتصفح واسمح بالتنبيهات لهذا الموقع.':'Notifications are blocked. Open your browser settings and allow notifications for this site.',
+'ما قدرنا نفعّل التنبيه على هذا الجوال. خلّ الصفحة مفتوحة وبتسمع النداء.':'We couldn\'t turn on alerts on this phone. Keep this page open and you\'ll hear the call.',
+'🔔 جرّب مرة ثانية':'🔔 Try again','خلّ هذي الصفحة مفتوحة، وبتسمع النداء أول ما يجهز طلبك.':'Keep this page open and you\'ll hear the call when your order is ready.'};
+const T=(s)=>isAr?s:(EN[s]||s);
+if(!isAr){
+  document.documentElement.lang='en'; document.documentElement.dir='ltr'; document.title=T(document.title);
+  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+  for(let n;(n=w.nextNode());){const k=n.nodeValue.trim(); if(k&&EN[k]) n.nodeValue=n.nodeValue.replace(k,EN[k]);}
+  document.querySelectorAll('[aria-label]').forEach(e=>{const k=e.getAttribute('aria-label'); if(EN[k]) e.setAttribute('aria-label',EN[k]);});
+}
+
 const SB='https://mqwtgwqyohrrvfjqwtgm.supabase.co', KEY='sb_publishable_Dudu901qJs-L-_JqynRQ6Q_dYUVj0vX';
 const VAPID='BNu1oHzNO_Ay89DhPQGeAoccyaw3_YXBEXqRVDyC_tP8pDBHDnWHKYw4cbpEUf9VCUYtrjTDfplOLxhE5eYbHtk';
 const id=new URLSearchParams(location.search).get('id')||'';
 const $=(x)=>document.getElementById(x);
 const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-const TXT={received:['استلمنا طلبك','بنبدأ نجهزه الحين'],preparing:['طلبك يتجهز','بنرسل لك تنبيه أول ما يجهز'],ready:['طلبك جاهز 🎉','تفضل استلمه من الكاشير'],
- collected:['بالعافية!','شكرًا لزيارتك'],cancelled:['انلغى الطلب','كلّم الكاشير لو عندك سؤال']};
+const TXT={received:[T('استلمنا طلبك'),T('بنبدأ نجهزه الحين')],preparing:[T('طلبك يتجهز'),T('بنرسل لك تنبيه أول ما يجهز')],ready:[T('طلبك جاهز 🎉'),T('تفضل استلمه من الكاشير')],
+ collected:[T('بالعافية!'),T('شكرًا لزيارتك')],cancelled:[T('انلغى الطلب'),T('كلّم الكاشير لو عندك سؤال')]};
 let last=null;
 const rpc=(fn,body)=>fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify(body)}).then(r=>r.ok?r.json():null).catch(()=>null);
 
@@ -90,8 +112,8 @@ function theme(t,logo){
   const r=document.documentElement.style;
   if(HEX.test(t.primary||'')){ r.setProperty('--red',t.primary); document.querySelector('meta[name=theme-color]').content=t.primary; }
   if(HEX.test(t.accent||'')){ r.setProperty('--saffron',t.accent); r.setProperty('--sink',lum(t.accent)>.4?'#1F1200':'#FFFFFF'); }
-  if(typeof t.ready_title==='string'&&t.ready_title) TXT.ready[0]=t.ready_title;
-  if(typeof t.ready_subtitle==='string'&&t.ready_subtitle) TXT.ready[1]=t.ready_subtitle;
+  if(typeof t.ready_title==='string'&&t.ready_title&&t.ready_title!=='طلبك جاهز') TXT.ready[0]=t.ready_title;
+  if(typeof t.ready_subtitle==='string'&&t.ready_subtitle&&t.ready_subtitle!=='تفضل استلمه من الكاشير') TXT.ready[1]=t.ready_subtitle;
   if(typeof logo==='string'&&/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(logo)){
     const i=document.querySelector('.shop i'); i.textContent=''; const im=document.createElement('img');
     im.src=logo; im.alt=''; im.style.cssText='width:100%;height:100%;border-radius:50%;object-fit:cover'; i.appendChild(im);
@@ -99,37 +121,37 @@ function theme(t,logo){
   }
 }
 async function load(){
-  if(!/^[0-9a-f-]{36}$/i.test(id)){ $('num').textContent='—'; $('title').textContent='الرابط ناقص'; $('sub').textContent='امسح الكود عند الكاشير مرة ثانية'; return; }
+  if(!/^[0-9a-f-]{36}$/i.test(id)){ $('num').textContent='—'; $('title').textContent=T('الرابط ناقص'); $('sub').textContent=T('امسح الكود عند الكاشير مرة ثانية'); return; }
   const j=await rpc('get_order',{p_id:id});
-  if(!j){ $('title').textContent='ما لقينا الطلب'; $('sub').textContent='تأكد من الكود عند الكاشير'; return; }
+  if(!j){ $('title').textContent=T('ما لقينا الطلب'); $('sub').textContent=T('تأكد من الكود عند الكاشير'); return; }
   $('num').textContent=String(j.number??'—');
-  if(j.cafe&&j.cafe.name){ $('shop').textContent=j.cafe.name; document.title='طلب '+j.number+' — '+j.cafe.name; }
+  if(j.cafe&&j.cafe.name){ $('shop').textContent=j.cafe.name; document.title=T('طلب ')+j.number+' — '+j.cafe.name; }
   theme(j.cafe&&j.cafe.theme||{}, j.logo);
   const t=TXT[j.status]||TXT.preparing; $('title').textContent=t[0]; $('sub').textContent=t[1];
   $('wrap').classList.toggle('ready',j.status==='ready');
-  const step={received:0,preparing:1,ready:2,collected:3}[j.status]??-1, names=['استلمنا','نحضّره','جاهز','استلمته'];
+  const step={received:0,preparing:1,ready:2,collected:3}[j.status]??-1, names=[T('استلمنا'),T('نحضّره'),T('جاهز'),T('استلمته')];
   const tr=$('track'); tr.classList.toggle('ready',j.status==='ready'); tr.classList.toggle('done',j.status==='collected');
   [...tr.children].forEach((d,i)=>{d.classList.toggle('on',i<=step);d.classList.toggle('now',i===step)});
-  tr.setAttribute('aria-label',step>=0?`مرحلة طلبك: ${names[step]}، ${step+1} من ٤`:'انلغى الطلب');
+  tr.setAttribute('aria-label',step>=0?(isAr?`مرحلة طلبك: ${names[step]}، ${step+1} من ٤`:`Your order: ${names[step]}, ${step+1} of 4`):T('انلغى الطلب'));
   if(last&&last!=='ready'&&j.status==='ready'){ chime(); navigator.vibrate&&navigator.vibrate([400,150,400]); }
   last=j.status;
 }
 
 function b64(s){s=s.replace(/-/g,'+').replace(/_/g,'/');const p='='.repeat((4-s.length%4)%4);const r=atob(s+p);return Uint8Array.from(r,c=>c.charCodeAt(0))}
 async function enable(){
-  const btn=$('notify'); btn.disabled=true; btn.textContent='لحظة…';
+  const btn=$('notify'); btn.disabled=true; btn.textContent=T('لحظة…');
   try{
     const perm=await Notification.requestPermission();
-    if(perm!=='granted'){ $('nnote').textContent='التنبيهات مقفلة. افتح إعدادات المتصفح واسمح بالتنبيهات لهذا الموقع.'; btn.disabled=false; btn.textContent='🔔 فعّل التنبيه'; return; }
+    if(perm!=='granted'){ $('nnote').textContent=T('التنبيهات مقفلة. افتح إعدادات المتصفح واسمح بالتنبيهات لهذا الموقع.'); btn.disabled=false; btn.textContent=T('🔔 فعّل التنبيه'); return; }
     const reg=await navigator.serviceWorker.register('/sw.js',{scope:'/'}); await navigator.serviceWorker.ready;
     let sub=await reg.pushManager.getSubscription();
     if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(VAPID)});
     const k=sub.toJSON();
-    const ok=await rpc('register_web_push',{p_id:id,p_endpoint:k.endpoint,p_p256dh:k.keys.p256dh,p_auth:k.keys.auth});
+    const ok=await rpc('register_web_push',{p_id:id,p_endpoint:k.endpoint,p_p256dh:k.keys.p256dh,p_auth:k.keys.auth,p_lang:isAr?'ar':'en'});
     if(ok===false) throw new Error('reg');
     try{localStorage.setItem('tonsa-on-'+id,'1')}catch(e){}
     $('android').hidden=true; $('on').hidden=false; chime();
-  }catch(e){ $('nnote').textContent='ما قدرنا نفعّل التنبيه على هذا الجوال. خلّ الصفحة مفتوحة وبتسمع النداء.'; btn.disabled=false; btn.textContent='🔔 جرّب مرة ثانية'; }
+  }catch(e){ $('nnote').textContent=T('ما قدرنا نفعّل التنبيه على هذا الجوال. خلّ الصفحة مفتوحة وبتسمع النداء.'); btn.disabled=false; btn.textContent=T('🔔 جرّب مرة ثانية'); }
 }
 
 if(isIOS){
@@ -140,7 +162,7 @@ if(isIOS){
   if(on&&Notification.permission==='granted'){ $('on').hidden=false; navigator.serviceWorker.register('/sw.js',{scope:'/'}); }
   else { $('android').hidden=false; $('notify').addEventListener('click',enable); }
 }else{
-  $('on').hidden=false; $('on').className='note'; $('on').textContent='خلّ هذي الصفحة مفتوحة، وبتسمع النداء أول ما يجهز طلبك.';
+  $('on').hidden=false; $('on').className='note'; $('on').textContent=T('خلّ هذي الصفحة مفتوحة، وبتسمع النداء أول ما يجهز طلبك.');
 }
 load(); setInterval(load,5000);
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) load(); });
