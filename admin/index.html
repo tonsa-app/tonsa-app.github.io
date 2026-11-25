@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#F03842">
+<title>لوحة المدير — Tonsa</title>
+<link rel="icon" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+:root{--red:#E5303C;--saffron:#F5B82E;--teal:#0E8C7E;--ink:#1C1416;--muted:#6B6266;--bg:#F4F2F3;--card:#fff;--line:rgba(0,0,0,.08)}
+@media (prefers-color-scheme:dark){:root{--ink:#F4F0F1;--muted:#A69DA1;--bg:#120E10;--card:#1E191B;--line:rgba(255,255,255,.09);--teal:#1FA89A}}
+*{box-sizing:border-box}
+body{margin:0;font:17px/1.5 -apple-system,"SF Arabic","Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);-webkit-text-size-adjust:100%}
+main{max-width:760px;margin:auto;padding:max(20px,env(safe-area-inset-top)) 16px 60px}
+h1{font-size:28px;margin:6px 0 2px}h2{font-size:20px;margin:28px 0 10px}
+.sub{color:var(--muted);margin:0 0 18px}
+.card{background:var(--card);border-radius:22px;padding:16px;margin:0 0 12px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+input,select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;width:100%;min-height:48px}
+button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:0 18px;min-height:46px;cursor:pointer;color:#fff;background:var(--red)}
+button.soft{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+button.gold{background:var(--saffron);color:#2A1A00}
+button.teal{background:var(--teal)}
+button:disabled{opacity:.5}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1 1 auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--bg)}
+.pill.pro{background:rgba(245,184,46,.2);color:#8A5A00}.pill.trial{background:rgba(91,108,240,.16);color:#3F4FD0}
+.pill.basic{background:rgba(14,140,126,.16);color:var(--teal)}.pill.none{background:rgba(229,48,60,.14);color:var(--red)}
+@media (prefers-color-scheme:dark){.pill.pro{color:#F5B82E}.pill.trial{color:#9AA6FF}}
+.meta{color:var(--muted);font-size:15px}
+.big{font-size:22px;font-weight:800;letter-spacing:1px;font-variant-numeric:tabular-nums}
+.req{border:2px solid var(--saffron)}
+.msg{white-space:pre-wrap;background:var(--bg);border-radius:14px;padding:12px;font-size:15px}
+.err{color:var(--red);font-weight:700}
+.hidden{display:none}
+@media (max-width:520px){.grid.one{grid-template-columns:1fr}}
+details summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+</style>
+</head>
+<body>
+<main>
+  <h1>لوحة المدير</h1>
+  <p class="sub">حسابات الكوفيهات والباقات — Tonsa</p>
+
+  <!-- الدخول -->
+  <section id="login" class="card">
+    <label for="key">مفتاح المدير</label>
+    <div class="row" style="margin-top:8px">
+      <input id="key" autocomplete="current-password" placeholder="XXXX-XXXX-XXXX" dir="ltr" style="text-align:center;letter-spacing:2px">
+      <button id="enter" style="flex:0 0 auto">دخول</button>
+    </div>
+    <p id="loginErr" class="err hidden"></p>
+  </section>
+
+  <section id="app" class="hidden">
+    <div id="reqs"></div>
+
+    <h2>كوفي جديد</h2>
+    <div class="card">
+      <div class="grid one">
+        <input id="newName" placeholder="اسم الكوفي">
+        <input id="newPhone" placeholder="جوال صاحب الكوفي (اختياري)" inputmode="tel" dir="ltr" style="text-align:right">
+      </div>
+      <p class="meta">ياخذ تجربة مجانية ١٤ يوم بكل مميزات الاحترافية.</p>
+      <button id="create" style="width:100%">أنشئ الحساب</button>
+      <div id="created" class="hidden" style="margin-top:14px"></div>
+    </div>
+
+    <h2>الكوفيهات <span id="count" class="meta"></span></h2>
+    <div id="list"></div>
+    <p class="meta" style="text-align:center"><button class="soft" id="logout">خروج</button></p>
+  </section>
+</main>
+
+<script>
+(() => {
+const API = 'https://mqwtgwqyohrrvfjqwtgm.supabase.co/functions/v1/admin';
+const KEY = 'sb_publishable_Dudu901qJs-L-_JqynRQ6Q_dYUVj0vX';
+const $ = (id) => document.getElementById(id);
+let adminKey = ''; try { adminKey = localStorage.getItem('tonsa-admin') || ''; } catch (e) {}
+let cafes = [];
+
+async function call(action, body = {}) {
+  const r = await fetch(API, { method: 'POST', headers: { 'content-type': 'application/json', apikey: KEY },
+    body: JSON.stringify({ key: adminKey, action, ...body }) });
+  const j = await r.json().catch(() => ({ error: 'خطأ في الاتصال' }));
+  if (j.error) throw new Error(j.error);
+  return j;
+}
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const days = (d) => d ? Math.ceil((new Date(d) - Date.now()) / 864e5) : null;
+const date = (d) => d ? new Date(d).toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+
+function planOf(c) {
+  const now = Date.now(), paid = c.paid_until ? Date.parse(c.paid_until) : 0, trial = c.trial_until ? Date.parse(c.trial_until) : 0;
+  if (paid > now) return c.plan === 'pro' ? ['pro', 'الاحترافية', `لين ${date(c.paid_until)} (باقي ${days(c.paid_until)} يوم)`]
+                                         : ['basic', 'الأساسية', `لين ${date(c.paid_until)} (باقي ${days(c.paid_until)} يوم)`];
+  if (trial > now) return ['trial', 'تجربة', `تنتهي ${date(c.trial_until)} (باقي ${days(c.trial_until)} يوم)`];
+  return ['none', 'منتهي', 'ما يقدر ينشئ طلبات'];
+}
+
+function welcome(c) {
+  return `أهلًا ${c.name} 👋\nحسابكم في Tonsa جاهز:\n\n1) حمّلوا تطبيق Tonsa من App Store\n2) افتحوا التطبيق واضغطوا "للمحلات"\n3) رمز المحل: ${c.code}\n4) الرقم السري: ${c.staff_pin}\n\nعندكم تجربة مجانية ١٤ يوم بكل المميزات.\nأي سؤال كلمونا هنا 🙏`;
+}
+const wa = (phone, text) => {
+  let p = String(phone || '').replace(/\D/g, ''); if (p.startsWith('05')) p = '966' + p.slice(1);
+  return `https://wa.me/${p}?text=${encodeURIComponent(text)}`;
+};
+
+function render(data) {
+  cafes = data.cafes;
+  $('count').textContent = `(${cafes.length})`;
+  const byId = Object.fromEntries(cafes.map((c) => [c.id, c]));
+  $('reqs').innerHTML = data.requests.length ? `<h2>طلبات ترقية 🔔</h2>` + data.requests.map((r) => {
+    const c = byId[r.cafe_id] || {};
+    return `<div class="card req"><div class="row"><div><b>${esc(c.name)}</b> يبي <b>${r.plan === 'pro' ? 'الاحترافية' : 'الأساسية'}</b>
+      <div class="meta">${date(r.created_at)} · رمز ${esc(c.code)}</div></div>
+      ${c.owner_phone ? `<a href="${wa(c.owner_phone, `أهلًا ${c.name}، وصلنا طلبكم للباقة ${r.plan === 'pro' ? 'الاحترافية' : 'الأساسية'} 🙌`)}" target="_blank"><button class="teal" style="flex:0 0 auto">واتساب</button></a>` : ''}
+      <button class="soft" style="flex:0 0 auto" data-dismiss="${r.id}">تجاهل</button></div>
+      <p class="meta">بعد ما يدفع، فعّل الباقة من كرت الكوفي تحت.</p></div>`;
+  }).join('') : '';
+
+  $('list').innerHTML = cafes.map((c) => {
+    const [k, name, detail] = planOf(c);
+    return `<div class="card" id="c-${c.id}">
+      <div class="row"><div><b style="font-size:19px">${esc(c.name)}</b><div class="meta">${c.orders_30d} طلب آخر ٣٠ يوم</div></div>
+        <span class="pill ${k}" style="flex:0 0 auto">${name}</span></div>
+      <p class="meta" style="margin:6px 0 10px">${detail}</p>
+      <div class="grid"><div><div class="meta">رمز المحل</div><div class="big">${esc(c.code)}</div></div>
+        <div><div class="meta">الرقم السري</div><div class="big">${esc(c.staff_pin)}</div></div></div>
+      <details style="margin-top:8px"><summary>فعّل باقة بعد الدفع</summary>
+        <div class="grid" style="margin:8px 0">
+          <select data-plan><option value="pro">الاحترافية</option><option value="basic">الأساسية</option></select>
+          <select data-months><option value="1">شهر</option><option value="3">٣ شهور</option><option value="6">٦ شهور</option><option value="12">سنة (يدفع ١٠ شهور)</option></select>
+        </div>
+        <button class="gold" style="width:100%" data-activate="${c.id}">فعّل</button>
+        <p class="meta">التفعيل يبدأ من نهاية اشتراكه الحالي لو ما خلص.</p>
+      </details>
+      <div class="row" style="margin-top:6px">
+        <button class="soft" data-copy="${c.id}">انسخ رسالة الترحيب</button>
+        ${c.owner_phone ? `<a href="${wa(c.owner_phone, welcome(c))}" target="_blank" style="flex:1 1 auto"><button class="teal" style="width:100%">أرسلها واتساب</button></a>` : ''}
+        <button class="soft" data-pin="${c.id}">رقم سري جديد</button>
+        <button class="soft" data-stop="${c.id}" style="color:var(--red)">أوقف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function load() {
+  try { render(await call('list')); $('login').classList.add('hidden'); $('app').classList.remove('hidden'); }
+  catch (e) { $('login').classList.remove('hidden'); $('app').classList.add('hidden'); if (adminKey) { $('loginErr').textContent = e.message; $('loginErr').classList.remove('hidden'); } }
+}
+
+$('enter').onclick = () => { adminKey = $('key').value.trim().toUpperCase(); try { localStorage.setItem('tonsa-admin', adminKey); } catch (e) {} load(); };
+$('key').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('enter').click(); });
+$('logout').onclick = () => { adminKey = ''; try { localStorage.removeItem('tonsa-admin'); } catch (e) {} location.reload(); };
+
+$('create').onclick = async () => {
+  const name = $('newName').value.trim(); if (!name) return $('newName').focus();
+  $('create').disabled = true;
+  try {
+    const { cafe } = await call('create', { name, phone: $('newPhone').value });
+    const text = welcome(cafe), phone = $('newPhone').value;
+    $('created').innerHTML = `<div class="grid"><div><div class="meta">رمز المحل</div><div class="big">${esc(cafe.code)}</div></div>
+      <div><div class="meta">الرقم السري</div><div class="big">${esc(cafe.staff_pin)}</div></div></div>
+      <p class="msg">${esc(text)}</p><div class="row"><button class="soft" id="copyNew">انسخ الرسالة</button>
+      ${phone ? `<a href="${wa(phone, text)}" target="_blank" style="flex:1 1 auto"><button class="teal" style="width:100%">أرسلها واتساب</button></a>` : ''}</div>`;
+    $('created').classList.remove('hidden');
+    $('copyNew').onclick = () => navigator.clipboard.writeText(text).then(() => ($('copyNew').textContent = 'انسخت ✓'));
+    $('newName').value = ''; $('newPhone').value = '';
+    render(await call('list'));
+  } catch (e) { alert(e.message); }
+  $('create').disabled = false;
+};
+
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  try {
+    if (b.dataset.activate) {
+      const card = $('c-' + b.dataset.activate);
+      const plan = card.querySelector('[data-plan]').value, months = card.querySelector('[data-months]').value;
+      const c = cafes.find((x) => x.id === b.dataset.activate);
+      if (!confirm(`تفعّل ${plan === 'pro' ? 'الاحترافية' : 'الأساسية'} لـ ${c.name} مدة ${card.querySelector('[data-months]').selectedOptions[0].text}؟`)) return;
+      b.disabled = true; await call('activate', { cafe_id: b.dataset.activate, plan, months }); render(await call('list'));
+    } else if (b.dataset.copy) {
+      const c = cafes.find((x) => x.id === b.dataset.copy);
+      await navigator.clipboard.writeText(welcome(c)); b.textContent = 'انسخت ✓';
+    } else if (b.dataset.pin) {
+      if (!confirm('تبي رقم سري جديد؟ الأجهزة المسجلة بتطلب الرقم الجديد.')) return;
+      await call('pin', { cafe_id: b.dataset.pin }); render(await call('list'));
+    } else if (b.dataset.stop) {
+      if (!confirm('توقف اشتراك هالكوفي الحين؟ ما بيقدر ينشئ طلبات.')) return;
+      await call('stop', { cafe_id: b.dataset.stop }); render(await call('list'));
+    } else if (b.dataset.dismiss) {
+      await call('dismiss', { request_id: b.dataset.dismiss }); render(await call('list'));
+    }
+  } catch (err) { alert(err.message); b.disabled = false; }
+});
+
+if (adminKey) { $('key').value = adminKey; load(); }
+})();
+</script>
+</body>
+</html>
