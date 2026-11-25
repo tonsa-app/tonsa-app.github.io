@@ -35,6 +35,11 @@ body{background:var(--ground);color:var(--ink);font:17px/1.6 "IBM Plex Sans Arab
 .track div.on::before{background:var(--red)}
 .track.ready div.on::before,.track.done div.on::before{background:var(--saffron)}
 .track div.now{color:var(--ink);font-weight:700}
+.hidden{display:none!important}
+.rate{position:relative;z-index:1;width:100%;max-width:340px;margin-top:16px;background:var(--paper);color:var(--ink);border-radius:22px;padding:14px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.faces{display:flex;gap:6px;margin-top:10px}.faces button{flex:1;font-size:30px;min-height:52px;border:0;border-radius:14px;background:rgba(127,127,127,.12);cursor:pointer}
+.gbtn{display:block;margin-top:12px;padding:14px;border-radius:999px;background:var(--saffron);color:var(--sink,#1F1200);font-weight:800;text-decoration:none}
+.share{position:relative;z-index:1;margin-top:14px;min-height:44px;border:0;background:none;color:var(--muted);font:inherit;font-weight:700;cursor:pointer}
 .cta{margin-top:22px;width:100%;max-width:340px;position:relative;z-index:1}
 button,.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;border:0;border-radius:18px;
  font-family:inherit;font-weight:700;font-size:17px;line-height:1;cursor:pointer;text-decoration:none}
@@ -56,6 +61,12 @@ footer a{color:inherit}
  </div>
 </main>
 <div class="track" id="track" role="img" aria-label="مرحلة طلبك"><div>استلمنا</div><div>نحضّره</div><div>جاهز</div><div>استلمته</div></div>
+<div class="rate hidden" id="rate">
+  <div id="rateQ"><b>وش رأيك بطلبك؟</b><div class="faces">
+    <button data-r="1" aria-label="تقييم 1 من 5">😞</button><button data-r="2" aria-label="تقييم 2 من 5">😕</button><button data-r="3" aria-label="تقييم 3 من 5">😐</button><button data-r="4" aria-label="تقييم 4 من 5">🙂</button><button data-r="5" aria-label="تقييم 5 من 5">😍</button></div></div>
+  <div id="rateDone" class="hidden"><b id="rateMsg"></b><a id="google" class="gbtn hidden" target="_blank" rel="noopener">⭐ قيّمنا في قوقل</a></div>
+</div>
+<button class="share" id="share" type="button">↗ شارك التذكرة مع صاحبك</button>
 <div class="cta">
  <div id="ios" hidden>
   <a class="btn primary" id="clip">افتح تذكرتك في Tonsa</a>
@@ -72,7 +83,7 @@ footer a{color:inherit}
 {
 // اللغة: عربي لو الجوال عربي، وإلا إنقليزي
 const isAr=(navigator.languages&&navigator.languages[0]||navigator.language||'ar').toLowerCase().startsWith('ar');
-const EN={'تذكرة طلبك — Tonsa':'Your order ticket — Tonsa','رقم طلبك':'Your order','نجيب طلبك…':'Loading your order…','لحظة':'One moment',
+const EN={'وش رأيك بطلبك؟':'How was your order?','⭐ قيّمنا في قوقل':'⭐ Rate us on Google','↗ شارك التذكرة مع صاحبك':'↗ Share this ticket with a friend','شكرًا! يسعدنا إنه عجبك 🙏':'Thanks! Glad you liked it 🙏','شكرًا على رأيك، بنتحسن 🙏':'Thanks for the feedback, we\'ll do better 🙏','انسخ الرابط ✓':'Link copied ✓','تابع طلبي في Tonsa':'Follow my order on Tonsa','تذكرة طلبك — Tonsa':'Your order ticket — Tonsa','رقم طلبك':'Your order','نجيب طلبك…':'Loading your order…','لحظة':'One moment',
 'افتح تذكرتك في Tonsa':'Open your ticket in Tonsa','يفتح بدون تحميل، ونناديك حتى لو جوالك مقفل.':'Opens without downloading, and we call you even if your phone is locked.',
 '🔔 فعّل التنبيه':'🔔 Turn on alerts','اضغط مرة وحدة، ونرسل لك تنبيه أول ما يجهز طلبك حتى لو جوالك مقفل.':'Tap once and we\'ll alert you as soon as your order is ready, even if your phone is locked.',
 '✓ التنبيه مفعّل. تقدر تقفل جوالك الحين.':'✓ Alerts are on. You can lock your phone now.','رؤى الرقمية':'Digital Insights',
@@ -99,7 +110,8 @@ const $=(x)=>document.getElementById(x);
 const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const TXT={received:[T('استلمنا طلبك'),T('بنبدأ نجهزه الحين')],preparing:[T('طلبك يتجهز'),T('بنرسل لك تنبيه أول ما يجهز')],ready:[T('طلبك جاهز 🎉'),T('تفضل استلمه من الكاشير')],
  collected:[T('بالعافية!'),T('شكرًا لزيارتك')],cancelled:[T('انلغى الطلب'),T('كلّم الكاشير لو عندك سؤال')]};
-let last=null;
+let last=null, started=Date.now(), rated=null, gurl=null;
+const VIB=[90,60,90,60,90,140,600]; // اهتزاز Tonsa المميز
 const rpc=(fn,body)=>fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify(body)}).then(r=>r.ok?r.json():null).catch(()=>null);
 
 function chime(){try{const a=new (window.AudioContext||window.webkitAudioContext)();[0,.18,.36].forEach((t,i)=>{const o=a.createOscillator(),g=a.createGain();o.frequency.value=[880,1175,1568][i];g.gain.setValueAtTime(.0001,a.currentTime+t);g.gain.exponentialRampToValueAtTime(.3,a.currentTime+t+.02);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t+.5);o.connect(g).connect(a.destination);o.start(a.currentTime+t);o.stop(a.currentTime+t+.55)})}catch(e){}}
@@ -123,7 +135,11 @@ function theme(t,logo){
 async function load(){
   if(!/^[0-9a-f-]{36}$/i.test(id)){ $('num').textContent='—'; $('title').textContent=T('الرابط ناقص'); $('sub').textContent=T('امسح الكود عند الكاشير مرة ثانية'); return; }
   const j=await rpc('get_order',{p_id:id});
-  if(!j){ $('title').textContent=T('ما لقينا الطلب'); $('sub').textContent=T('تأكد من الكود عند الكاشير'); return; }
+  if(!j){
+    // ممكن الطلب انكتب والنت فاصل عند الكاشير: نكمل نحاول دقيقتين قبل ما نقول ما لقيناه
+    if(Date.now()-started<120000){ $('title').textContent=T('لحظة…'); return; }
+    $('title').textContent=T('ما لقينا الطلب'); $('sub').textContent=T('تأكد من الكود عند الكاشير'); return;
+  }
   $('num').textContent=String(j.number??'—');
   if(j.cafe&&j.cafe.name){ $('shop').textContent=j.cafe.name; document.title=T('طلب ')+j.number+' — '+j.cafe.name; }
   theme(j.cafe&&j.cafe.theme||{}, j.logo);
@@ -133,10 +149,26 @@ async function load(){
   const tr=$('track'); tr.classList.toggle('ready',j.status==='ready'); tr.classList.toggle('done',j.status==='collected');
   [...tr.children].forEach((d,i)=>{d.classList.toggle('on',i<=step);d.classList.toggle('now',i===step)});
   tr.setAttribute('aria-label',step>=0?(isAr?`مرحلة طلبك: ${names[step]}، ${step+1} من ٤`:`Your order: ${names[step]}, ${step+1} of 4`):T('انلغى الطلب'));
-  if(last&&last!=='ready'&&j.status==='ready'){ chime(); navigator.vibrate&&navigator.vibrate([400,150,400]); }
+  if(last&&last!=='ready'&&j.status==='ready'){ chime(); navigator.vibrate&&navigator.vibrate(VIB); }
+  if(typeof j.google_review_url==='string'&&/^https:\/\//.test(j.google_review_url)) gurl=j.google_review_url;
+  if(j.rating) rated=j.rating;
+  const canRate=j.status==='ready'||j.status==='collected';
+  $('rate').classList.toggle('hidden',!canRate); showRated();
   last=j.status;
 }
 
+function showRated(){
+  $('rateQ').classList.toggle('hidden',!!rated); $('rateDone').classList.toggle('hidden',!rated);
+  if(!rated) return;
+  $('rateMsg').textContent=rated>=4?T('شكرًا! يسعدنا إنه عجبك 🙏'):T('شكرًا على رأيك، بنتحسن 🙏');
+  const g=$('google'); if(rated>=4&&gurl){ g.href=gurl; g.classList.remove('hidden'); } else g.classList.add('hidden');
+}
+document.querySelectorAll('.faces button').forEach(b=>b.onclick=()=>{ rated=+b.dataset.r; showRated(); rpc('rate_order',{p_id:id,p_rating:rated}); });
+$('share').onclick=async()=>{
+  const url=location.origin+'/o/?id='+id;
+  try{ if(navigator.share){ await navigator.share({title:T('تابع طلبي في Tonsa'),url}); return; } }catch(e){ return; }
+  try{ await navigator.clipboard.writeText(url); $('share').textContent=T('انسخ الرابط ✓'); }catch(e){}
+};
 function b64(s){s=s.replace(/-/g,'+').replace(/_/g,'/');const p='='.repeat((4-s.length%4)%4);const r=atob(s+p);return Uint8Array.from(r,c=>c.charCodeAt(0))}
 async function enable(){
   const btn=$('notify'); btn.disabled=true; btn.textContent=T('لحظة…');

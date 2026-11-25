@@ -124,14 +124,18 @@ function render(data) {
       <p class="meta">بعد ما يدفع، فعّل الباقة من كرت الكوفي تحت.</p></div>`;
   }).join('') : '';
 
+  const groups = {}; cafes.forEach((c) => { if (c.owner_group) (groups[c.owner_group] ||= []).push(c.name); });
   $('list').innerHTML = cafes.map((c) => {
     const [k, name, detail] = planOf(c);
+    const siblings = c.owner_group ? groups[c.owner_group].filter((n) => n !== c.name) : [];
     return `<div class="card" id="c-${c.id}">
       <div class="row"><div><b style="font-size:19px">${esc(c.name)}</b><div class="meta">${c.orders_30d} طلب آخر ٣٠ يوم</div></div>
         <span class="pill ${k}" style="flex:0 0 auto">${name}</span></div>
       <p class="meta" style="margin:6px 0 10px">${detail}</p>
       <div class="grid"><div><div class="meta">رمز المحل</div><div class="big">${esc(c.code)}</div></div>
-        <div><div class="meta">الرقم السري</div><div class="big">${esc(c.staff_pin)}</div></div></div>
+        <div><div class="meta">${c.manager_pin ? 'رقم الكاشير' : 'الرقم السري'}</div><div class="big">${esc(c.staff_pin)}</div></div></div>
+      ${c.manager_pin ? `<p class="meta">رقم المدير: <b dir="ltr">${esc(c.manager_pin)}</b></p>` : ''}
+      ${siblings.length ? `<p class="meta">🏪 فروعه: ${siblings.map(esc).join('، ')} <button class="soft" style="min-height:34px;padding:0 10px;font-size:14px" data-unlink="${c.id}">افصل</button></p>` : ''}
       <details style="margin-top:8px"><summary>فعّل باقة بعد الدفع</summary>
         <div class="grid" style="margin:8px 0">
           <select data-plan><option value="pro">الاحترافية</option><option value="basic">الأساسية</option></select>
@@ -140,6 +144,10 @@ function render(data) {
         <button class="gold" style="width:100%" data-activate="${c.id}">فعّل</button>
         <p class="meta">التفعيل يبدأ من نهاية اشتراكه الحالي لو ما خلص.</p>
       </details>
+      ${cafes.length > 1 ? `<details style="margin-top:4px"><summary>اربطه بفرع ثاني لنفس المالك</summary>
+        <div class="row" style="margin:8px 0"><select data-with>${cafes.filter((x) => x.id !== c.id).map((x) => `<option value="${x.id}">${esc(x.name)} (${esc(x.code)})</option>`).join('')}</select>
+        <button class="soft" style="flex:0 0 auto" data-link="${c.id}">اربط</button></div>
+        <p class="meta">بعد الربط، المالك يشوف مقارنة الفروع في التقارير.</p></details>` : ''}
       <div class="row" style="margin-top:6px">
         <button class="soft" data-copy="${c.id}">انسخ رسالة الترحيب</button>
         ${c.owner_phone ? `<a href="${wa(c.owner_phone, welcome(c))}" target="_blank" style="flex:1 1 auto"><button class="teal" style="width:100%">أرسلها واتساب</button></a>` : ''}
@@ -195,6 +203,11 @@ document.addEventListener('click', async (e) => {
     } else if (b.dataset.stop) {
       if (!confirm('توقف اشتراك هالكوفي الحين؟ ما بيقدر ينشئ طلبات.')) return;
       await call('stop', { cafe_id: b.dataset.stop }); render(await call('list'));
+    } else if (b.dataset.link) {
+      const card = $('c-' + b.dataset.link);
+      await call('link', { cafe_id: b.dataset.link, with_id: card.querySelector('[data-with]').value }); render(await call('list'));
+    } else if (b.dataset.unlink) {
+      await call('unlink', { cafe_id: b.dataset.unlink }); render(await call('list'));
     } else if (b.dataset.dismiss) {
       await call('dismiss', { request_id: b.dataset.dismiss }); render(await call('list'));
     }

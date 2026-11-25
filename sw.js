@@ -11,7 +11,7 @@ self.addEventListener('push', (e) => {
     tag: 'tonsa-' + (d.order_id || ''),
     renotify: true,
     requireInteraction: true,
-    vibrate: [400, 150, 400, 150, 600],
+    vibrate: [90, 60, 90, 60, 90, 140, 600], // اهتزاز Tonsa المميز
     data: { url: '/o/?id=' + (d.order_id || '') },
     dir: 'rtl', lang: 'ar',
   }));
