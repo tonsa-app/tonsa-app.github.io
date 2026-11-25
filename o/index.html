@@ -75,12 +75,29 @@ const rpc=(fn,body)=>fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{'Co
 
 function chime(){try{const a=new (window.AudioContext||window.webkitAudioContext)();[0,.18,.36].forEach((t,i)=>{const o=a.createOscillator(),g=a.createGain();o.frequency.value=[880,1175,1568][i];g.gain.setValueAtTime(.0001,a.currentTime+t);g.gain.exponentialRampToValueAtTime(.3,a.currentTime+t+.02);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t+.5);o.connect(g).connect(a.destination);o.start(a.currentTime+t);o.stop(a.currentTime+t+.55)})}catch(e){}}
 
+const HEX=/^#[0-9a-fA-F]{6}$/;
+function lum(h){const c=[1,3,5].map(i=>parseInt(h.substr(i,2),16)/255).map(x=>x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4));return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+let themed='';
+function theme(t,logo){
+  const key=JSON.stringify(t)+(logo?logo.length:0); if(key===themed) return; themed=key;
+  const r=document.documentElement.style;
+  if(HEX.test(t.primary||'')){ r.setProperty('--red',t.primary); document.querySelector('meta[name=theme-color]').content=t.primary; }
+  if(HEX.test(t.accent||'')){ r.setProperty('--saffron',t.accent); r.setProperty('--sink',lum(t.accent)>.4?'#1F1200':'#FFFFFF'); }
+  if(typeof t.ready_title==='string'&&t.ready_title) TXT.ready[0]=t.ready_title;
+  if(typeof t.ready_subtitle==='string'&&t.ready_subtitle) TXT.ready[1]=t.ready_subtitle;
+  if(typeof logo==='string'&&/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(logo)){
+    const i=document.querySelector('.shop i'); i.textContent=''; const im=document.createElement('img');
+    im.src=logo; im.alt=''; im.style.cssText='width:100%;height:100%;border-radius:50%;object-fit:cover'; i.appendChild(im);
+    i.style.width='32px'; i.style.height='32px';
+  }
+}
 async function load(){
   if(!/^[0-9a-f-]{36}$/i.test(id)){ $('num').textContent='—'; $('title').textContent='الرابط ناقص'; $('sub').textContent='امسح الكود عند الكاشير مرة ثانية'; return; }
   const j=await rpc('get_order',{p_id:id});
   if(!j){ $('title').textContent='ما لقينا الطلب'; $('sub').textContent='تأكد من الكود عند الكاشير'; return; }
   $('num').textContent=String(j.number??'—');
   if(j.cafe&&j.cafe.name){ $('shop').textContent=j.cafe.name; document.title='طلب '+j.number+' — '+j.cafe.name; }
+  theme(j.cafe&&j.cafe.theme||{}, j.logo);
   const t=TXT[j.status]||TXT.preparing; $('title').textContent=t[0]; $('sub').textContent=t[1];
   $('wrap').classList.toggle('ready',j.status==='ready');
   if(last&&last!=='ready'&&j.status==='ready'){ chime(); navigator.vibrate&&navigator.vibrate([400,150,400]); }
