@@ -78,6 +78,7 @@ footer a{color:inherit}
   <div id="rateDone" class="hidden"><b id="rateMsg"></b><a id="google" class="gbtn hidden" target="_blank" rel="noopener">⭐ قيّمنا في قوقل</a></div>
 </div>
 <button class="share" id="share" type="button">↗ شارك التذكرة مع صاحبك</button>
+<button class="share" id="saveimg" type="button">📷 احفظ التذكرة صورة</button>
 <div class="cta">
  <div id="ios" hidden>
   <a class="btn primary" id="clip">افتح تذكرتك في Tonsa</a>
@@ -93,7 +94,9 @@ footer a{color:inherit}
 <script>
 {
 // اللغة: عربي لو الجوال عربي، وإلا إنقليزي
-const isAr=(navigator.languages&&navigator.languages[0]||navigator.language||'ar').toLowerCase().startsWith('ar');
+const L0=(navigator.languages&&navigator.languages[0]||navigator.language||'ar').toLowerCase();
+const LANG=L0.startsWith('ar')?'ar':L0.startsWith('ur')?'ur':L0.startsWith('hi')?'hi':(L0.startsWith('fil')||L0.startsWith('tl'))?'tl':L0.startsWith('bn')?'bn':'en';
+const isAr=LANG==='ar';
 const EN={'وش رأيك بطلبك؟':'How was your order?','⭐ قيّمنا في قوقل':'⭐ Rate us on Google','↗ شارك التذكرة مع صاحبك':'↗ Share this ticket with a friend','شكرًا! يسعدنا إنه عجبك 🙏':'Thanks! Glad you liked it 🙏','شكرًا على رأيك، بنتحسن 🙏':'Thanks for the feedback, we\'ll do better 🙏','انسخ الرابط ✓':'Link copied ✓','تابع طلبي في Tonsa':'Follow my order on Tonsa','تذكرة طلبك — Tonsa':'Your order ticket — Tonsa','رقم طلبك':'Your order','نجيب طلبك…':'Loading your order…','لحظة':'One moment',
 'افتح تذكرتك في Tonsa':'Open your ticket in Tonsa','يفتح بدون تحميل، ونناديك حتى لو جوالك مقفل.':'Opens without downloading, and we call you even if your phone is locked.',
 '🔔 فعّل التنبيه':'🔔 Turn on alerts','اضغط مرة وحدة، ونرسل لك تنبيه أول ما يجهز طلبك حتى لو جوالك مقفل.':'Tap once and we\'ll alert you as soon as your order is ready, even if your phone is locked.',
@@ -105,13 +108,35 @@ const EN={'وش رأيك بطلبك؟':'How was your order?','⭐ قيّمنا �
 'الرابط ناقص':'Incomplete link','امسح الكود عند الكاشير مرة ثانية':'Scan the code at the counter again','ما لقينا الطلب':'Order not found','تأكد من الكود عند الكاشير':'Check the code at the counter',
 'طلب ':'Order ','سيارتك':'Your car','استلمناها':'Received','نغسلها':'Washing','جاهزة':'Ready','استلمتها':'Picked up','استلمنا سيارتك':'We got your car','بنبدأ عليها الحين':'We\'ll start on it now','نغسل سيارتك 🧽':'Washing your car 🧽','بنرسل لك تنبيه أول ما تخلص':'We\'ll alert you as soon as it\'s done','سيارتك جاهزة 🚗✨':'Your car is ready 🚗✨','تفضل استلمها':'Come pick it up','الله يسلمك!':'Drive safe!','وش رأيك بالغسيل؟':'How was the wash?','المجموع':'Total','💵 الدفع عند السيارة':'💵 Pay at the car','ر.س':'SAR','انلغى الطلب ':'Order cancelled','لحظة…':'One moment…','التنبيهات مقفلة. افتح إعدادات المتصفح واسمح بالتنبيهات لهذا الموقع.':'Notifications are blocked. Open your browser settings and allow notifications for this site.',
 'ما قدرنا نفعّل التنبيه على هذا الجوال. خلّ الصفحة مفتوحة وبتسمع النداء.':'We couldn\'t turn on alerts on this phone. Keep this page open and you\'ll hear the call.',
-'🔔 جرّب مرة ثانية':'🔔 Try again','خلّ هذي الصفحة مفتوحة، وبتسمع النداء أول ما يجهز طلبك.':'Keep this page open and you\'ll hear the call when your order is ready.'};
-const T=(s)=>isAr?s:(EN[s]||s);
+'🔔 جرّب مرة ثانية':'🔔 Try again','📷 احفظ التذكرة صورة':'📷 Save ticket as image','خلّ هذي الصفحة مفتوحة، وبتسمع النداء أول ما يجهز طلبك.':'Keep this page open and you\'ll hear the call when your order is ready.'};
+// لغات العمالة: أوردو، هندي، فلبيني، بنغالي (اللي ما ترجمناه يطلع إنقليزي)
+const MORE={
+ur:{'رقم طلبك':'آپ کا آرڈر نمبر','سيارتك':'آپ کی گاڑی','استلمنا':'موصول','نحضّره':'تیاری میں','جاهز':'تیار','استلمته':'وصول کر لیا','استلمناها':'موصول','نغسلها':'دھلائی','جاهزة':'تیار','استلمتها':'وصول کر لی',
+ 'استلمنا طلبك':'ہمیں آپ کا آرڈر مل گیا','بنبدأ نجهزه الحين':'ہم ابھی تیاری شروع کر رہے ہیں','طلبك يتجهز':'آپ کا آرڈر تیار ہو رہا ہے','بنرسل لك تنبيه أول ما يجهز':'تیار ہوتے ہی ہم آپ کو اطلاع دیں گے','طلبك جاهز 🎉':'آپ کا آرڈر تیار ہے 🎉','تفضل استلمه من الكاشير':'براہ کرم کاؤنٹر سے لے لیں','بالعافية!':'مزے کریں!','شكرًا لزيارتك':'آنے کا شکریہ',
+ 'استلمنا سيارتك':'ہمیں آپ کی گاڑی مل گئی','بنبدأ عليها الحين':'ہم ابھی کام شروع کر رہے ہیں','نغسل سيارتك 🧽':'آپ کی گاڑی دھل رہی ہے 🧽','بنرسل لك تنبيه أول ما تخلص':'ختم ہوتے ہی ہم آپ کو اطلاع دیں گے','سيارتك جاهزة 🚗✨':'آپ کی گاڑی تیار ہے 🚗✨','تفضل استلمها':'براہ کرم لے لیں','الله يسلمك!':'محفوظ سفر!',
+ '🔔 فعّل التنبيه':'🔔 اطلاع آن کریں','اضغط مرة وحدة، ونرسل لك تنبيه أول ما يجهز طلبك حتى لو جوالك مقفل.':'ایک بار دبائیں، آرڈر تیار ہوتے ہی اطلاع ملے گی چاہے فون بند ہو۔','✓ التنبيه مفعّل. تقدر تقفل جوالك الحين.':'✓ اطلاع آن ہے۔ اب آپ فون بند کر سکتے ہیں۔',
+ 'افتح تذكرتك في Tonsa':'Tonsa میں اپنا ٹکٹ کھولیں','المجموع':'کل','💵 الدفع عند السيارة':'💵 ادائیگی گاڑی پر','ر.س':'ریال','وش رأيك بالغسيل؟':'دھلائی کیسی لگی؟','وش رأيك بطلبك؟':'آپ کا آرڈر کیسا تھا؟','📷 احفظ التذكرة صورة':'📷 ٹکٹ تصویر محفوظ کریں','↗ شارك التذكرة مع صاحبك':'↗ ٹکٹ دوست کو بھیجیں','لحظة…':'ایک لمحہ…'},
+hi:{'رقم طلبك':'आपका ऑर्डर नंबर','سيارتك':'आपकी गाड़ी','استلمنا':'मिल गया','نحضّره':'तैयारी','جاهز':'तैयार','استلمته':'ले लिया','استلمناها':'मिल गई','نغسلها':'धुलाई','جاهزة':'तैयार','استلمتها':'ले ली',
+ 'استلمنا طلبك':'हमें आपका ऑर्डर मिल गया','بنبدأ نجهزه الحين':'हम अभी तैयारी शुरू कर रहे हैं','طلبك يتجهز':'आपका ऑर्डर तैयार हो रहा है','بنرسل لك تنبيه أول ما يجهز':'तैयार होते ही हम आपको सूचना देंगे','طلبك جاهز 🎉':'आपका ऑर्डर तैयार है 🎉','تفضل استلمه من الكاشير':'कृपया काउंटर से ले लें','بالعافية!':'आनंद लें!','شكرًا لزيارتك':'आने के लिए धन्यवाद',
+ 'استلمنا سيارتك':'हमें आपकी गाड़ी मिल गई','بنبدأ عليها الحين':'हम अभी काम शुरू कर रहे हैं','نغسل سيارتك 🧽':'आपकी गाड़ी धुल रही है 🧽','بنرسل لك تنبيه أول ما تخلص':'पूरा होते ही हम आपको सूचना देंगे','سيارتك جاهزة 🚗✨':'आपकी गाड़ी तैयार है 🚗✨','تفضل استلمها':'कृपया ले जाएँ','الله يسلمك!':'सुरक्षित यात्रा!',
+ '🔔 فعّل التنبيه':'🔔 सूचना चालू करें','اضغط مرة وحدة، ونرسل لك تنبيه أول ما يجهز طلبك حتى لو جوالك مقفل.':'एक बार दबाएँ, ऑर्डर तैयार होते ही सूचना मिलेगी, फ़ोन लॉक हो तब भी।','✓ التنبيه مفعّل. تقدر تقفل جوالك الحين.':'✓ सूचना चालू है। अब आप फ़ोन लॉक कर सकते हैं।',
+ 'افتح تذكرتك في Tonsa':'Tonsa में अपना टिकट खोलें','المجموع':'कुल','💵 الدفع عند السيارة':'💵 भुगतान गाड़ी पर','ر.س':'रियाल','وش رأيك بالغسيل؟':'धुलाई कैसी लगी?','وش رأيك بطلبك؟':'आपका ऑर्डर कैसा था?','📷 احفظ التذكرة صورة':'📷 टिकट की तस्वीर सेव करें','↗ شارك التذكرة مع صاحبك':'↗ टिकट दोस्त को भेजें','لحظة…':'एक पल…'},
+tl:{'رقم طلبك':'Numero ng order mo','سيارتك':'Ang sasakyan mo','استلمنا':'Natanggap','نحضّره':'Inihahanda','جاهز':'Handa na','استلمته':'Nakuha na','استلمناها':'Natanggap','نغسلها':'Hinuhugasan','جاهزة':'Handa na','استلمتها':'Nakuha na',
+ 'استلمنا طلبك':'Natanggap namin ang order mo','بنبدأ نجهزه الحين':'Sisimulan na naming ihanda','طلبك يتجهز':'Inihahanda ang order mo','بنرسل لك تنبيه أول ما يجهز':'Aabisuhan ka namin kapag handa na','طلبك جاهز 🎉':'Handa na ang order mo 🎉','تفضل استلمه من الكاشير':'Pakikuha sa counter','بالعافية!':'Enjoy!','شكرًا لزيارتك':'Salamat sa pagbisita',
+ 'استلمنا سيارتك':'Natanggap namin ang sasakyan mo','بنبدأ عليها الحين':'Sisimulan na namin','نغسل سيارتك 🧽':'Hinuhugasan ang sasakyan mo 🧽','بنرسل لك تنبيه أول ما تخلص':'Aabisuhan ka namin kapag tapos na','سيارتك جاهزة 🚗✨':'Handa na ang sasakyan mo 🚗✨','تفضل استلمها':'Pakikuha na','الله يسلمك!':'Ingat sa biyahe!',
+ '🔔 فعّل التنبيه':'🔔 I-on ang abiso','اضغط مرة وحدة، ونرسل لك تنبيه أول ما يجهز طلبك حتى لو جوالك مقفل.':'Pindutin nang isang beses at aabisuhan ka namin kahit naka-lock ang phone mo.','✓ التنبيه مفعّل. تقدر تقفل جوالك الحين.':'✓ Naka-on ang abiso. Puwede mo nang i-lock ang phone mo.',
+ 'افتح تذكرتك في Tonsa':'Buksan ang ticket mo sa Tonsa','المجموع':'Kabuuan','💵 الدفع عند السيارة':'💵 Bayad sa sasakyan','ر.س':'SAR','وش رأيك بالغسيل؟':'Kumusta ang paghugas?','وش رأيك بطلبك؟':'Kumusta ang order mo?','📷 احفظ التذكرة صورة':'📷 I-save ang ticket bilang larawan','↗ شارك التذكرة مع صاحبك':'↗ Ibahagi ang ticket sa kaibigan','لحظة…':'Sandali…'},
+bn:{'رقم طلبك':'আপনার অর্ডার নম্বর','سيارتك':'আপনার গাড়ি','استلمنا':'পেয়েছি','نحضّره':'তৈরি হচ্ছে','جاهز':'তৈরি','استلمته':'নিয়েছেন','استلمناها':'পেয়েছি','نغسلها':'ধোয়া হচ্ছে','جاهزة':'তৈরি','استلمتها':'নিয়েছেন',
+ 'استلمنا طلبك':'আমরা আপনার অর্ডার পেয়েছি','بنبدأ نجهزه الحين':'এখনই তৈরি শুরু করছি','طلبك يتجهز':'আপনার অর্ডার তৈরি হচ্ছে','بنرسل لك تنبيه أول ما يجهز':'তৈরি হলেই আমরা জানাব','طلبك جاهز 🎉':'আপনার অর্ডার তৈরি 🎉','تفضل استلمه من الكاشير':'অনুগ্রহ করে কাউন্টার থেকে নিন','بالعافية!':'উপভোগ করুন!','شكرًا لزيارتك':'আসার জন্য ধন্যবাদ',
+ 'استلمنا سيارتك':'আমরা আপনার গাড়ি পেয়েছি','بنبدأ عليها الحين':'এখনই কাজ শুরু করছি','نغسل سيارتك 🧽':'আপনার গাড়ি ধোয়া হচ্ছে 🧽','بنرسل لك تنبيه أول ما تخلص':'শেষ হলেই আমরা জানাব','سيارتك جاهزة 🚗✨':'আপনার গাড়ি তৈরি 🚗✨','تفضل استلمها':'অনুগ্রহ করে নিয়ে যান','الله يسلمك!':'নিরাপদে যান!',
+ '🔔 فعّل التنبيه':'🔔 নোটিফিকেশন চালু করুন','اضغط مرة وحدة، ونرسل لك تنبيه أول ما يجهز طلبك حتى لو جوالك مقفل.':'একবার চাপুন, অর্ডার তৈরি হলেই জানাব, ফোন লক থাকলেও।','✓ التنبيه مفعّل. تقدر تقفل جوالك الحين.':'✓ নোটিফিকেশন চালু। এখন ফোন লক করতে পারেন।',
+ 'افتح تذكرتك في Tonsa':'Tonsa-তে আপনার টিকিট খুলুন','المجموع':'মোট','💵 الدفع عند السيارة':'💵 গাড়িতে পেমেন্ট','ر.س':'রিয়াল','وش رأيك بالغسيل؟':'ধোয়া কেমন হলো?','وش رأيك بطلبك؟':'আপনার অর্ডার কেমন ছিল?','📷 احفظ التذكرة صورة':'📷 টিকিটের ছবি সেভ করুন','↗ شارك التذكرة مع صاحبك':'↗ বন্ধুকে টিকিট পাঠান','لحظة…':'এক মুহূর্ত…'}};
+const T=(s)=>isAr?s:((MORE[LANG]&&MORE[LANG][s])||EN[s]||s);
 if(!isAr){
-  document.documentElement.lang='en'; document.documentElement.dir='ltr'; document.title=T(document.title);
+  document.documentElement.lang=LANG; document.documentElement.dir=LANG==='ur'?'rtl':'ltr'; document.title=T(document.title);
   const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
-  for(let n;(n=w.nextNode());){const k=n.nodeValue.trim(); if(k&&EN[k]) n.nodeValue=n.nodeValue.replace(k,EN[k]);}
-  document.querySelectorAll('[aria-label]').forEach(e=>{const k=e.getAttribute('aria-label'); if(EN[k]) e.setAttribute('aria-label',EN[k]);});
+  for(let n;(n=w.nextNode());){const k=n.nodeValue.trim(); const v=k&&T(k); if(v&&v!==k) n.nodeValue=n.nodeValue.replace(k,v);}
+  document.querySelectorAll('[aria-label]').forEach(e=>{const k=e.getAttribute('aria-label'); if(T(k)!==k) e.setAttribute('aria-label',T(k));});
 }
 
 const SB='https://mqwtgwqyohrrvfjqwtgm.supabase.co', KEY='sb_publishable_Dudu901qJs-L-_JqynRQ6Q_dYUVj0vX';
@@ -127,11 +152,22 @@ const rpc=(fn,body)=>fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{'Co
 
 function chime(){try{const a=new (window.AudioContext||window.webkitAudioContext)();[0,.18,.36].forEach((t,i)=>{const o=a.createOscillator(),g=a.createGain();o.frequency.value=[880,1175,1568][i];g.gain.setValueAtTime(.0001,a.currentTime+t);g.gain.exponentialRampToValueAtTime(.3,a.currentTime+t+.02);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t+.5);o.connect(g).connect(a.destination);o.start(a.currentTime+t);o.stop(a.currentTime+t+.55)})}catch(e){}}
 
+// نغمة المحل: نفس ملفات التطبيق
+const TONES=['tonsa','bell','chime','marimba','harp','happy','soft','oriental','digital','alert','cup','drops','horn'];
+let TONE='tonsa', actx=null;
+const ac=()=>actx||(actx=new (window.AudioContext||window.webkitAudioContext)());
+document.addEventListener('pointerdown',()=>{try{ac().resume()}catch(e){}},{once:true});
+async function playTone(){
+  try{ const b=await fetch('/sounds/'+TONE+'.wav').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()});
+    const buf=await ac().decodeAudioData(b), src=ac().createBufferSource(); src.buffer=buf; src.connect(ac().destination); src.start(); }
+  catch(e){ chime(); }
+}
 const HEX=/^#[0-9a-fA-F]{6}$/;
 function lum(h){const c=[1,3,5].map(i=>parseInt(h.substr(i,2),16)/255).map(x=>x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4));return .2126*c[0]+.7152*c[1]+.0722*c[2]}
 let themed='';
 function theme(t,logo){
   const key=JSON.stringify(t)+(logo?logo.length:0); if(key===themed) return; themed=key;
+  if(TONES.includes(t.sound)) TONE=t.sound;
   const r=document.documentElement.style;
   if(HEX.test(t.primary||'')){ r.setProperty('--red',t.primary); document.querySelector('meta[name=theme-color]').content=t.primary; }
   if(HEX.test(t.accent||'')){ r.setProperty('--saffron',t.accent); r.setProperty('--sink',lum(t.accent)>.4?'#1F1200':'#FFFFFF'); }
@@ -151,6 +187,7 @@ async function load(){
     if(Date.now()-started<120000){ $('title').textContent=T('لحظة…'); return; }
     $('title').textContent=T('ما لقينا الطلب'); $('sub').textContent=T('تأكد من الكود عند الكاشير'); return;
   }
+  lastJ=j;
   $('num').textContent=String(j.number??'—');
   if(j.kind==='carwash') wash(j);
   if(j.cafe&&j.cafe.name){ $('shop').textContent=j.cafe.name; document.title=T('طلب ')+j.number+' — '+j.cafe.name; }
@@ -161,7 +198,7 @@ async function load(){
   const tr=$('track'); tr.classList.toggle('ready',j.status==='ready'); tr.classList.toggle('done',j.status==='collected');
   [...tr.children].forEach((d,i)=>{d.classList.toggle('on',i<=step);d.classList.toggle('now',i===step)});
   tr.setAttribute('aria-label',step>=0?(isAr?`مرحلة طلبك: ${names[step]}، ${step+1} من ٤`:`Your order: ${names[step]}, ${step+1} of 4`):T('انلغى الطلب'));
-  if(last&&last!=='ready'&&j.status==='ready'){ chime(); navigator.vibrate&&navigator.vibrate(VIB); }
+  if(last&&last!=='ready'&&j.status==='ready'){ playTone(); navigator.vibrate&&navigator.vibrate(VIB); }
   if(typeof j.google_review_url==='string'&&/^https:\/\//.test(j.google_review_url)) gurl=j.google_review_url;
   if(j.rating) rated=j.rating;
   const canRate=j.status==='ready'||j.status==='collected';
@@ -213,6 +250,27 @@ $('share').onclick=async()=>{
   try{ if(navigator.share){ await navigator.share({title:T('تابع طلبي في Tonsa'),url}); return; } }catch(e){ return; }
   try{ await navigator.clipboard.writeText(url); $('share').textContent=T('انسخ الرابط ✓'); }catch(e){}
 };
+// يرسم التذكرة صورة: العميل يرسلها لأحد يستلم عنه
+let lastJ=null;
+$('saveimg').onclick=async()=>{
+  const j=lastJ; if(!j) return;
+  const W=1080,H=1350,c=document.createElement('canvas'); c.width=W;c.height=H; const g=c.getContext('2d');
+  const css=getComputedStyle(document.documentElement), red=css.getPropertyValue('--red').trim()||'#E5303C', saf=css.getPropertyValue('--saffron').trim()||'#F5B82E';
+  const F='"IBM Plex Sans Arabic",system-ui,sans-serif'; g.direction=document.documentElement.dir; g.textAlign='center';
+  g.fillStyle='#F2F2F7'; g.fillRect(0,0,W,H);
+  g.fillStyle='#fff'; g.beginPath(); g.roundRect(90,170,900,1000,60); g.fill();
+  const ready=j.status==='ready'; g.fillStyle=ready?saf:red; g.beginPath(); g.roundRect(90,830,900,340,[0,0,60,60]); g.fill();
+  g.fillStyle='#1B1418'; g.font='700 52px '+F; g.fillText((j.cafe&&j.cafe.name)||'Tonsa',W/2,120);
+  g.fillStyle='#6B6268'; g.font='600 48px '+F; g.fillText(T(j.kind==='carwash'?'سيارتك':'رقم طلبك'),W/2,330);
+  const big=j.kind==='carwash'?((j.plate_letters?j.plate_letters+'  ':'')+(j.plate_num||j.number)):String(j.number);
+  g.fillStyle=red; g.font='700 '+(big.length>6?150:240)+'px '+F; g.fillText(big,W/2,600);
+  g.fillStyle=ready?'#2B1A00':'#fff'; g.font='700 64px '+F; g.fillText($('title').textContent,W/2,980);
+  g.font='500 40px '+F; g.fillText($('sub').textContent,W/2,1060);
+  g.fillStyle='#9a9a9a'; g.font='600 34px '+F; g.fillText('Tonsa',W/2,1260);
+  const blob=await new Promise(r=>c.toBlob(r,'image/png')); const file=new File([blob],'tonsa-ticket.png',{type:'image/png'});
+  try{ if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); return; } }catch(e){ return; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tonsa-ticket.png'; a.click();
+};
 function b64(s){s=s.replace(/-/g,'+').replace(/_/g,'/');const p='='.repeat((4-s.length%4)%4);const r=atob(s+p);return Uint8Array.from(r,c=>c.charCodeAt(0))}
 async function enable(){
   const btn=$('notify'); btn.disabled=true; btn.textContent=T('لحظة…');
@@ -223,7 +281,7 @@ async function enable(){
     let sub=await reg.pushManager.getSubscription();
     if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(VAPID)});
     const k=sub.toJSON();
-    const ok=await rpc('register_web_push',{p_id:id,p_endpoint:k.endpoint,p_p256dh:k.keys.p256dh,p_auth:k.keys.auth,p_lang:isAr?'ar':'en'});
+    const ok=await rpc('register_web_push',{p_id:id,p_endpoint:k.endpoint,p_p256dh:k.keys.p256dh,p_auth:k.keys.auth,p_lang:LANG});
     if(ok===false) throw new Error('reg');
     try{localStorage.setItem('tonsa-on-'+id,'1')}catch(e){}
     $('android').hidden=true; $('on').hidden=false; chime();
