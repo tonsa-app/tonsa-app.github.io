@@ -6,6 +6,8 @@
 <link rel="icon" href="/favicon.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="/loyal.js"></script>
 <style>
 :root{--red:#E5303C;--saffron:#F5B82E;--sink:#2B1A00;--ground:#F2F2F7;--paper:#fff;--ink:#1B1418;--muted:#6B6268}
 @media (prefers-color-scheme:dark){:root{--ground:#111;--paper:#1F1B1D;--ink:#F6EFEC;--muted:#B5AAAE}}
@@ -49,32 +51,8 @@ button,.btn{display:flex;align-items:center;justify-content:center;gap:8px;width
 .ok{color:#1E8E3E;font-weight:700}
 :focus-visible{outline:3px solid var(--saffron);outline-offset:3px}
 [hidden]{display:none!important}
-/* بطاقة الأختام: ثلاث أشكال (ختم حبر، كوب يتعبّى، مشوار) */
-.loyal{position:relative;z-index:1;width:100%;max-width:340px;margin-top:16px;border-radius:24px;padding:18px;color:#fff;
- background:var(--ly,#1B1418);box-shadow:0 10px 26px rgba(0,0,0,.18);overflow:hidden}
-.loyal.light{color:#1a1a1a}
-.loyal .wm{position:absolute;top:-30px;left:-20px;font-size:120px;opacity:.07;transform:rotate(-14deg);pointer-events:none}
-.loyal.stamp{background:#F3E9D8;color:#3B2416}
-.loyal.stamp::after{content:"";position:absolute;inset:6px;border:1.5px dashed color-mix(in srgb,var(--sink-ink,#8A2B1D) 30%,transparent);border-radius:18px;pointer-events:none}
-.ly-top{display:flex;justify-content:space-between;align-items:baseline;position:relative}
-.ly-top b{font-size:17px;display:block}.ly-top small{font-size:12px;opacity:.65}
-.ly-n{font:600 28px/1 Georgia,"Times New Roman",serif;font-variant-numeric:tabular-nums}
-.ly-stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:14px 0 12px;position:relative}
-.ly-stamps i{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:600;
- border:1.5px dashed color-mix(in srgb,var(--sk) 35%,transparent);color:color-mix(in srgb,var(--sk) 50%,transparent)}
-.ly-stamps i.gift{font-size:20px}
-.ly-stamps i.on{border:2.5px solid var(--sk);color:inherit;font-size:21px;box-shadow:inset 0 0 0 3px #F3E9D8,inset 0 0 0 4px var(--sk);background:color-mix(in srgb,var(--sk) 8%,transparent);opacity:.92}
-.ly-stamps i.pop{animation:slam .55s cubic-bezier(.3,1.5,.5,1) both}
-@keyframes slam{0%{transform:scale(2.2) rotate(-30deg);opacity:0}100%{opacity:.92}}
-.ly-cup{display:flex;gap:18px;align-items:center;position:relative}
-.ly-cup svg{flex:0 0 104px;height:120px}
-.ly-big{font:800 46px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums}.ly-big small{font-size:16px;opacity:.7;font-weight:600;margin-inline-start:4px}
-.ly-bar{display:flex;gap:4px;margin-top:8px}.ly-bar span{flex:1;height:6px;border-radius:3px;background:currentColor;opacity:.2}.ly-bar span.on{background:var(--saffron);opacity:1}
-.liq{transition:y .7s cubic-bezier(.3,1.3,.5,1),height .7s cubic-bezier(.3,1.3,.5,1)}
-.ly-road{width:100%;display:block;margin-top:6px;position:relative}
-.ly-road .tok{transition:transform .8s cubic-bezier(.3,1.3,.5,1)}
-.ly-foot{font-size:14px;opacity:.85;margin-top:12px;position:relative}
-.ly-gift{margin-top:12px;background:var(--saffron,#F5B82E);color:#2B1A00;border-radius:14px;padding:10px 12px;font-weight:800;text-align:center;position:relative;animation:slam .5s both}
+/* بطاقة الأختام: شكلها في /loyal.js */
+#loyal{position:relative;z-index:1;width:100%;max-width:340px;margin-top:18px}
 .mplate{direction:ltr;display:grid;grid-template-columns:1fr 1fr 34px;border:2.5px solid #111;border-radius:10px;overflow:hidden;background:#fff;color:#111;width:250px;margin:8px auto 0;font-variant-numeric:tabular-nums}
 .mplate .c{display:grid;grid-template-rows:1fr 1fr;border-right:2px solid #111;text-align:center}
 .mplate .c span{font-weight:700;font-size:26px;letter-spacing:3px;min-height:44px;display:grid;place-items:center}
@@ -208,69 +186,18 @@ function theme(t,logo){
 }
 // بطاقة الأختام: جوال العميل له رقم ثابت، ونجمع أختامه عند المحل
 const ICON={cup:'☕',iced:'🧋',burger:'🍔',pizza:'🍕',croissant:'🥐',donut:'🍩',icecream:'🍦',car:'🚗',drop:'💧',sparkle:'✨',star:'⭐',heart:'❤️'};
+document.head.insertAdjacentHTML('beforeend','<style>'+LoyalCard.css+'</style>');
 const DEV=(()=>{try{let d=localStorage.getItem('tonsa-dev');if(!d){d=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2)).replace(/[^A-Za-z0-9-]/g,'');localStorage.setItem('tonsa-dev',d);}return d;}catch(e){return null;}})();
 let lyShown=-1, lyKey='', lyStatus=null;
 async function loadCard(){
   if(!DEV) return;
   const c=await rpc('get_card',{p_order:id,p_device:DEV});
   if(!c||!c.on){ $('loyal').hidden=true; return; }
-  const cfg=c.cfg, goal=cfg.goal, n=Math.min(c.stamps,goal), key=n+'/'+c.rewards;
+  const key=c.stamps+'/'+c.rewards;
   if(key===lyKey) return; lyKey=key;
-  const wash=lastJ&&lastJ.kind==='carwash', st=['stamp','cup','road'].includes(cfg.style)?cfg.style:(wash?'road':'cup');
-  const col=/^#[0-9a-fA-F]{6}$/.test(cfg.color)?cfg.color:'#1B1418', light=col.toUpperCase()==='#F2E8DA';
-  const em=ICON[cfg.icon]||'☕', full=n>=goal||c.rewards>0, left=goal-n, prev=lyShown;
-  const reward=isAr?cfg.reward_ar:cfg.reward_en, D=x=>isAr?ard(x):String(x);
-  const L=$('loyal'); L.hidden=false; L.className='loyal '+st+(light&&st!=='stamp'?' light':'');
-  L.style.setProperty('--ly',col); L.style.setProperty('--sk',light?'#8A2B1D':col);
-  const shop=(lastJ&&lastJ.cafe&&lastJ.cafe.name)||'';
-  const esc=t=>String(t).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-  const top=`<div class="ly-top"><div><b>${esc(shop||T('بطاقة الأختام'))}</b>${shop?`<small>${T('بطاقة الأختام')}</small>`:''}</div><span class="ly-n">${D(n)}/${D(goal)}</span></div>`;
-  let h=st==='stamp'?'':`<span class="wm" aria-hidden="true">${wash&&st==='cup'?'🫧':em}</span>`;
-  if(st==='stamp'){
-    h+=top+'<div class="ly-stamps" aria-hidden="true">';
-    for(let i=0;i<goal;i++){
-      if(i<n){ const r=((i*37)%17-8)*1.6; h+=`<i class="on${prev>=0&&i>=prev?' pop':''}" style="transform:rotate(${r}deg)">${em}</i>`; }
-      else if(i===goal-1) h+='<i class="gift">🎁</i>'; else h+=`<i>${D(i+1)}</i>`;
-    }
-    h+='</div>';
-  } else if(st==='cup'){
-    const f=n/goal, ink=light?'#1a1a1a':'#fff', hh=98*f;
-    const fill=wash
-      ? `<defs><clipPath id="lyc"><path d="M8 82 Q10 66 22 62 L34 44 Q38 38 46 38 H70 Q78 38 84 46 L94 60 Q104 62 104 72 V84 Q104 90 98 90 H12 Q8 90 8 84 Z"/></clipPath></defs>
-         <g clip-path="url(#lyc)"><rect width="110" height="120" fill="${ink}" opacity=".15"/><rect class="liq" x="0" y="${90-52*f}" width="110" height="${52*f+30}" fill="#5CC9F2"/></g>
-         <path d="M8 82 Q10 66 22 62 L34 44 Q38 38 46 38 H70 Q78 38 84 46 L94 60 Q104 62 104 72 V84 Q104 90 98 90 H12 Q8 90 8 84 Z" fill="none" stroke="${ink}" stroke-width="3" stroke-linejoin="round"/>
-         <circle cx="28" cy="92" r="9" fill="${col}" stroke="${ink}" stroke-width="3"/><circle cx="84" cy="92" r="9" fill="${col}" stroke="${ink}" stroke-width="3"/>
-         ${f>.05?[0,1,2,3,4].map(i=>`<circle cx="${14+i*20}" cy="${84-52*f-(i*13%22)}" r="${4+i*3%6}" fill="none" stroke="${ink}" stroke-width="1.5" opacity=".8"/>`).join(''):''}`
-      : `<defs><clipPath id="lyc"><path d="M6 17 H82 L72 112 Q71 118 64 118 H24 Q17 118 16 112 Z"/></clipPath></defs>
-         <g clip-path="url(#lyc)"><rect width="110" height="120" fill="${ink}" opacity=".1"/><rect class="liq" x="0" y="${118-hh}" width="110" height="${hh}" fill="#B7800C"/>${f>0?`<rect class="liq" x="0" y="${116-hh}" width="110" height="6" rx="3" fill="#F3E9D8"/>`:''}</g>
-         <path d="M6 17 H82 L72 112 Q71 118 64 118 H24 Q17 118 16 112 Z" fill="none" stroke="${ink}" stroke-width="3"/>
-         <path d="M80 38 Q108 36 104 64 Q101 84 76 84" fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>`;
-    h+=`<div class="ly-cup"><svg viewBox="0 0 110 120" aria-hidden="true">${fill}${full?'<text x="40" y="14" font-size="16" text-anchor="middle">✨</text>':''}</svg>
-      <div style="flex:1"><div style="font-size:14px;font-weight:600;opacity:.75">${esc(shop||T('بطاقة الأختام'))}</div>
-      <div class="ly-big">${D(n)}<small>${isAr?'من '+D(goal):'of '+goal}</small></div>
-      <div class="ly-bar">${Array.from({length:goal},(_,i)=>`<span class="${i<n?'on':''}"></span>`).join('')}</div></div></div>`;
-  } else {
-    const cols=5, cnt=goal+1, rows=Math.ceil(cnt/cols), W=300, H=rows*52, pad=22, stp=(W-pad*2)/(cols-1);
-    const P=[...Array(cnt)].map((_,i)=>{const r=Math.floor(i/cols);let cc=r%2?cols-1-(i%cols):i%cols;if(isAr)cc=cols-1-cc;return[pad+cc*stp,24+r*52];});
-    const path=pts=>{let d=`M${pts[0][0]} ${pts[0][1]}`;for(let i=1;i<pts.length;i++){const[a,b]=[pts[i-1],pts[i]];if(a[1]!==b[1]){const o=a[0]>W/2?26:-26;d+=` C${a[0]+o} ${a[1]} ${b[0]+o} ${b[1]} ${b[0]} ${b[1]}`}else d+=` L${b[0]} ${b[1]}`}return d};
-    const ink=light?'#1a1a1a':'#fff', all=path(P), done=path(P.slice(0,n+1)), [tx,ty]=P[Math.min(n,goal)];
-    let sv=`<path d="${all}" fill="none" stroke="${ink}" stroke-opacity=".18" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="${all}" fill="none" stroke="${ink}" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="5 6"/>
-      ${n>0?`<path d="${done}" fill="none" stroke="#F5B82E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`:''}`;
-    P.forEach(([x,y],i)=>{ sv+= i===cnt-1
-      ? `<circle cx="${x}" cy="${y}" r="${full?21:19}" fill="${full?'#F5B82E':ink}" fill-opacity="${full?1:.15}" stroke="#F5B82E" stroke-width="2"/><text x="${x}" y="${y+7}" font-size="19" text-anchor="middle">🎁</text>`
-      : `<circle cx="${x}" cy="${y}" r="6" fill="${i<=n?'#F5B82E':col}" stroke="${i<=n?'#F5B82E':ink}" stroke-opacity="${i<=n?1:.45}" stroke-width="2"/>`; });
-    if(!full){ const [px,py]=prev>=0&&prev<n?P[prev]:[tx,ty];
-      sv+=`<g class="tok" id="lyTok" transform="translate(${px} ${py})"><circle r="19" fill="#fff"/><text y="7" font-size="19" text-anchor="middle">${em}</text></g>`; }
-    h+=top+`<svg class="ly-road" viewBox="0 0 ${W} ${H}" aria-hidden="true">${sv}</svg>`;
-    if(!full) setTimeout(()=>{const t=$('lyTok'); if(t) t.setAttribute('transform',`translate(${tx} ${ty})`);},60);
-  }
-  const foot=full?'':st==='cup'?(wash?(isAr?`باقي ${D(left)} غسلات وتاخذ: ${reward}`:`${left} more washes for: ${reward}`):(isAr?`باقي ${D(left)} وكوبك يتعبّى: ${reward}`:`${left} more to fill your cup: ${reward}`))
-    :st==='road'?(isAr?`باقي ${D(left)} محطات وتوصل: ${reward}`:`${left} more stops to reach: ${reward}`):(isAr?`باقي ${D(left)} وتاخذ: ${reward}`:`${left} more for: ${reward}`);
-  h+= full?`<div class="ly-gift">${esc(isAr?`🎁 عندك مكافأة: ${reward}. قلها للكاشير`:`🎁 You have a reward: ${reward}. Tell the cashier`)}</div>`:`<div class="ly-foot">${esc(foot)}</div>`;
-  L.innerHTML=h;
-  L.setAttribute('aria-label',(isAr?`${n} أختام من ${goal}. `:`${n} of ${goal} stamps. `)+(full?(isAr?'عندك مكافأة':'Reward ready'):foot));
-  lyShown=n;
+  const L=$('loyal'); L.hidden=false;
+  L.innerHTML=LoyalCard.html(c,{ar:isAr,qr:true,prev:lyShown>=0?lyShown:null,wash:!!(lastJ&&lastJ.kind==='carwash')});
+  lyShown=c.stamps;
 }
 async function load(){
   if(!/^[0-9a-f-]{36}$/i.test(id)){ $('num').textContent='—'; $('title').textContent=T('الرابط ناقص'); $('sub').textContent=T('امسح الكود عند الكاشير مرة ثانية'); return; }

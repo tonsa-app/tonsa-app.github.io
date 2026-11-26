@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F2F2F7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>بطاقة الأختام — Tonsa</title>
+<link rel="icon" href="/favicon.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="/loyal.js"></script>
+<style>
+:root{--ground:#F2F2F7;--paper:#fff;--ink:#1B1418;--muted:#6B6268;--brand:#E5303C}
+@media (prefers-color-scheme:dark){:root{--ground:#0d0d0f;--paper:#1F1B1D;--ink:#F6EFEC;--muted:#B5AAAE}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font:17px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif;min-height:100vh;
+ display:flex;flex-direction:column;align-items:center;padding:max(22px,env(safe-area-inset-top)) 18px 40px}
+[hidden]{display:none!important}
+h1{font-size:24px;margin:8px 0 2px;text-align:center}.sub{color:var(--muted);text-align:center;margin:0 0 20px}
+.join{width:100%;max-width:340px;background:var(--paper);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.join label{font-weight:600;font-size:15px}
+.join input{font:inherit;padding:12px 14px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--ink) 15%,transparent);background:transparent;color:inherit}
+.btn{font-family:inherit;font-weight:700;font-size:18px;line-height:1;border:0;border-radius:999px;padding:17px;background:var(--brand);color:#fff;cursor:pointer;width:100%}
+.btn:disabled{opacity:.6}
+.tip{max-width:340px;color:var(--muted);font-size:14px;text-align:center;margin-top:18px}
+.toast{position:fixed;top:max(16px,env(safe-area-inset-top));inset-inline:16px;margin:auto;max-width:340px;background:#1f8f4e;color:#fff;font-weight:700;
+ border-radius:16px;padding:12px 16px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:drop .5s cubic-bezier(.3,1.4,.5,1)}
+@keyframes drop{from{transform:translateY(-120%)}}
+:focus-visible{outline:3px solid #F5B82E;outline-offset:3px}
+</style>
+</head><body>
+<main id="app" style="width:100%;display:flex;flex-direction:column;align-items:center">
+  <h1 id="title">لحظة…</h1><p class="sub" id="sub"></p>
+  <div id="card" style="width:100%;display:flex;justify-content:center"></div>
+  <form class="join" id="join" hidden>
+    <label for="nm">اسمك (اختياري)</label>
+    <input id="nm" maxlength="30" autocomplete="given-name" placeholder="مثلًا: ياسر">
+    <button class="btn" id="go" type="submit">خذ بطاقتي</button>
+  </form>
+  <p class="tip" id="tip" hidden></p>
+</main>
+<div class="toast" id="toast" hidden role="status"></div>
+<script>
+document.head.insertAdjacentHTML('beforeend','<style>'+LoyalCard.css+'</style>');
+const SB='https://mqwtgwqyohrrvfjqwtgm.supabase.co', KEY='sb_publishable_Dudu901qJs-L-_JqynRQ6Q_dYUVj0vX';
+const $=id=>document.getElementById(id);
+const isAr=!/^en/i.test(navigator.language||'ar');
+if(!isAr){document.documentElement.lang='en';document.documentElement.dir='ltr';}
+const T=(a,e)=>isAr?a:e;
+const shop=(new URLSearchParams(location.search).get('s')||'').replace(/[^0-9]/g,'');
+const DEV=(()=>{try{let d=localStorage.getItem('tonsa-dev');if(!d){d=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2)).replace(/[^A-Za-z0-9-]/g,'');localStorage.setItem('tonsa-dev',d);}return d;}catch(e){return null;}})();
+const KEYJ='tonsa-card-'+shop;
+const rpc=(fn,body)=>fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify(body)}).then(r=>r.ok?r.json():null).catch(()=>null);
+let last=null;
+$('nm').placeholder=T('مثلًا: ياسر','e.g. Sara'); document.querySelector('label[for=nm]').textContent=T('اسمك (اختياري)','Your name (optional)'); $('go').textContent=T('خذ بطاقتي','Get my card');
+function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,3500);}
+function render(c){
+  const prev=last?last.stamps:null;
+  if(last && (c.stamps!==last.stamps||c.rewards!==last.rewards)){
+    if(c.rewards>last.rewards) toast(T('🎉 كمّلت البطاقة! مكافأتك جاهزة','🎉 Card complete! Your reward is ready'));
+    else if(c.stamps>last.stamps) toast(T('✓ انضاف لك ختم','✓ You got a stamp'));
+    else if(c.rewards<last.rewards) toast(T('🎁 استمتع بمكافأتك','🎁 Enjoy your reward'));
+    try{navigator.vibrate&&navigator.vibrate([40,40,80])}catch(e){}
+  }
+  if(last && c.stamps===last.stamps && c.rewards===last.rewards && c.name===last.name) return;
+  last=c;
+  const name=c.shop&&c.shop.name||'';
+  document.title=T('بطاقة ','Card · ')+name;
+  $('title').textContent=name; $('sub').textContent=T('طلّع الباركود للكاشير كل ما تطلب','Show this barcode at the counter every time you order');
+  $('card').innerHTML=LoyalCard.html(c,{ar:isAr,qr:true,prev:prev});
+  $('tip').hidden=false;
+  $('tip').textContent=/iphone|ipad/i.test(navigator.userAgent)
+    ?T('💡 عشان توصل لها بسرعة: اضغط زر المشاركة ⬆︎ ثم «إضافة إلى الشاشة الرئيسية»','💡 Quick access: tap Share ⬆︎ then “Add to Home Screen”')
+    :T('💡 عشان توصل لها بسرعة: من قائمة المتصفح اختر «إضافة إلى الشاشة الرئيسية»','💡 Quick access: choose “Add to Home screen” from the browser menu');
+}
+async function load(name){
+  const c=await rpc('loyalty_join',{p_shop:shop,p_device:DEV,p_name:name||null});
+  if(!c){ $('title').textContent=T('ما لقينا المحل','Shop not found'); $('sub').textContent=T('امسح الباركود مرة ثانية','Scan the code again'); return false; }
+  if(!c.on){ $('title').textContent=c.shop&&c.shop.name||''; $('sub').textContent=T('بطاقة الأختام موقفة عند المحل حاليًا','The stamp card is paused at this shop'); $('join').hidden=true; return false; }
+  try{localStorage.setItem(KEYJ,'1')}catch(e){}
+  $('join').hidden=true; render(c); return true;
+}
+(async()=>{
+  if(!shop||!DEV){ $('title').textContent=T('الرابط ناقص','Link incomplete'); return; }
+  let had=false; try{had=!!localStorage.getItem(KEYJ)}catch(e){}
+  if(had){ await load(); }
+  else{
+    $('title').textContent=T('بطاقة الأختام','Stamp card'); $('sub').textContent=T('اجمع الأختام وخذ مكافأتك','Collect stamps and get your reward');
+    $('join').hidden=false;
+  }
+  $('join').addEventListener('submit',async e=>{e.preventDefault();$('go').disabled=true;await load($('nm').value.trim());$('go').disabled=false;});
+  // نحدّث البطاقة كل شوي عشان يبان الختم الجديد أول ما ينحط
+  setInterval(()=>{ if(last&&!document.hidden) load(); },8000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&last) load(); });
+})();
+</script>
+</body></html>

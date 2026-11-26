@@ -61,7 +61,7 @@ details summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;alig
     <h2>كوفي جديد</h2>
     <div class="card">
       <div class="grid one">
-        <select id="newKind"><option value="cafe">☕ كوفي / مطعم</option><option value="carwash">🚗 مغسلة سيارات</option></select>
+        <select id="newKind"><option value="cafe">☕ كوفي / مطعم</option><option value="carwash">🚗 مغسلة سيارات</option><option value="loyalty">🎟️ بطاقة ولاء بس</option></select>
         <input id="newName" placeholder="اسم المحل">
         <input id="newPhone" placeholder="جوال صاحب الكوفي (اختياري)" inputmode="tel" dir="ltr" style="text-align:right">
       </div>
@@ -101,9 +101,11 @@ function planOf(c) {
   if (paid > now) return c.plan === 'pro' ? ['pro', 'الاحترافية', `لين ${date(c.paid_until)} (باقي ${days(c.paid_until)} يوم)`]
                                          : ['basic', 'الأساسية', `لين ${date(c.paid_until)} (باقي ${days(c.paid_until)} يوم)`];
   if (trial > now) return ['trial', 'تجربة', `تنتهي ${date(c.trial_until)} (باقي ${days(c.trial_until)} يوم)`];
+  if (c.loyalty_until && Date.parse(c.loyalty_until) > now) return ['basic', 'ولاء بس', `بطاقة الولاء لين ${date(c.loyalty_until)} (باقي ${days(c.loyalty_until)} يوم)`];
   return ['none', 'منتهي', 'ما يقدر ينشئ طلبات'];
 }
 
+const planLabel = (p) => p === 'pro' ? 'الباقة الاحترافية' : p === 'loyalty' ? 'بطاقة الولاء' : 'الباقة الأساسية';
 function welcome(c) {
   return `أهلًا ${c.name} 👋\nحسابكم في Tonsa جاهز:\n\n1) حمّلوا تطبيق Tonsa من App Store\n2) افتحوا التطبيق واضغطوا "للمحلات"\n3) رمز المحل: ${c.code}\n4) الرقم السري: ${c.staff_pin}\n\nعندكم تجربة مجانية ١٤ يوم بكل المميزات.\nأي سؤال كلمونا هنا 🙏`;
 }
@@ -118,9 +120,9 @@ function render(data) {
   const byId = Object.fromEntries(cafes.map((c) => [c.id, c]));
   $('reqs').innerHTML = data.requests.length ? `<h2>طلبات ترقية 🔔</h2>` + data.requests.map((r) => {
     const c = byId[r.cafe_id] || {};
-    return `<div class="card req"><div class="row"><div><b>${esc(c.name)}</b> يبي <b>${r.plan === 'pro' ? 'الاحترافية' : 'الأساسية'}</b>
+    return `<div class="card req"><div class="row"><div><b>${esc(c.name)}</b> يبي <b>${planLabel(r.plan)}</b>
       <div class="meta">${date(r.created_at)} · رمز ${esc(c.code)}</div></div>
-      ${c.owner_phone ? `<a href="${wa(c.owner_phone, `أهلًا ${c.name}، وصلنا طلبكم للباقة ${r.plan === 'pro' ? 'الاحترافية' : 'الأساسية'} 🙌`)}" target="_blank"><button class="teal" style="flex:0 0 auto">واتساب</button></a>` : ''}
+      ${c.owner_phone ? `<a href="${wa(c.owner_phone, `أهلًا ${c.name}، وصلنا طلبكم لـ${planLabel(r.plan)} 🙌`)}" target="_blank"><button class="teal" style="flex:0 0 auto">واتساب</button></a>` : ''}
       <button class="soft" style="flex:0 0 auto" data-dismiss="${r.id}">تجاهل</button></div>
       <p class="meta">بعد ما يدفع، فعّل الباقة من كرت الكوفي تحت.</p></div>`;
   }).join('') : '';
@@ -130,16 +132,16 @@ function render(data) {
     const [k, name, detail] = planOf(c);
     const siblings = c.owner_group ? groups[c.owner_group].filter((n) => n !== c.name) : [];
     return `<div class="card" id="c-${c.id}">
-      <div class="row"><div><b style="font-size:19px">${c.business_type === 'carwash' ? '🚗 ' : ''}${esc(c.name)}</b><div class="meta">${c.orders_30d} طلب آخر ٣٠ يوم</div></div>
+      <div class="row"><div><b style="font-size:19px">${c.business_type === 'carwash' ? '🚗 ' : ''}${!c.trial_until && !c.paid_until && c.loyalty_until ? '🎟️ ' : ''}${esc(c.name)}</b><div class="meta">${c.orders_30d} طلب آخر ٣٠ يوم</div></div>
         <span class="pill ${k}" style="flex:0 0 auto">${name}</span></div>
-      <p class="meta" style="margin:6px 0 10px">${detail}</p>
+      <p class="meta" style="margin:6px 0 10px">${detail}${k !== 'basic' || !c.loyalty_until ? (c.loyalty_until && Date.parse(c.loyalty_until) > Date.now() ? ` · 🎟️ ولاء لين ${date(c.loyalty_until)}` : '') : ''}</p>
       <div class="grid"><div><div class="meta">رمز المحل</div><div class="big">${esc(c.code)}</div></div>
         <div><div class="meta">${c.manager_pin ? 'رقم الكاشير' : 'الرقم السري'}</div><div class="big">${esc(c.staff_pin)}</div></div></div>
       ${c.manager_pin ? `<p class="meta">رقم المدير: <b dir="ltr">${esc(c.manager_pin)}</b></p>` : ''}
       ${siblings.length ? `<p class="meta">🏪 فروعه: ${siblings.map(esc).join('، ')} <button class="soft" style="min-height:34px;padding:0 10px;font-size:14px" data-unlink="${c.id}">افصل</button></p>` : ''}
       <details style="margin-top:8px"><summary>فعّل باقة بعد الدفع</summary>
         <div class="grid" style="margin:8px 0">
-          <select data-plan><option value="pro">الاحترافية</option><option value="basic">الأساسية</option></select>
+          <select data-plan><option value="pro">الاحترافية</option><option value="basic">الأساسية</option><option value="loyalty">بطاقة الولاء (٣٩)</option></select>
           <select data-months><option value="1">شهر</option><option value="3">٣ شهور</option><option value="6">٦ شهور</option><option value="12">سنة (يدفع ١٠ شهور)</option></select>
         </div>
         <button class="gold" style="width:100%" data-activate="${c.id}">فعّل</button>
@@ -193,7 +195,7 @@ document.addEventListener('click', async (e) => {
       const card = $('c-' + b.dataset.activate);
       const plan = card.querySelector('[data-plan]').value, months = card.querySelector('[data-months]').value;
       const c = cafes.find((x) => x.id === b.dataset.activate);
-      if (!confirm(`تفعّل ${plan === 'pro' ? 'الاحترافية' : 'الأساسية'} لـ ${c.name} مدة ${card.querySelector('[data-months]').selectedOptions[0].text}؟`)) return;
+      if (!confirm(`تفعّل ${planLabel(plan)} لـ ${c.name} مدة ${card.querySelector('[data-months]').selectedOptions[0].text}؟`)) return;
       b.disabled = true; await call('activate', { cafe_id: b.dataset.activate, plan, months }); render(await call('list'));
     } else if (b.dataset.copy) {
       const c = cafes.find((x) => x.id === b.dataset.copy);
@@ -202,8 +204,10 @@ document.addEventListener('click', async (e) => {
       if (!confirm('تبي رقم سري جديد؟ الأجهزة المسجلة بتطلب الرقم الجديد.')) return;
       await call('pin', { cafe_id: b.dataset.pin }); render(await call('list'));
     } else if (b.dataset.stop) {
-      if (!confirm('توقف اشتراك هالكوفي الحين؟ ما بيقدر ينشئ طلبات.')) return;
-      await call('stop', { cafe_id: b.dataset.stop }); render(await call('list'));
+      const c = cafes.find((x) => x.id === b.dataset.stop);
+      const onlyLoy = c && !c.trial_until && !c.paid_until && c.loyalty_until;
+      if (!confirm(onlyLoy ? 'توقف بطاقة الولاء لهالمحل الحين؟' : 'توقف اشتراك هالكوفي الحين؟ ما بيقدر ينشئ طلبات.')) return;
+      await call('stop', { cafe_id: b.dataset.stop, plan: onlyLoy ? 'loyalty' : undefined }); render(await call('list'));
     } else if (b.dataset.link) {
       const card = $('c-' + b.dataset.link);
       await call('link', { cafe_id: b.dataset.link, with_id: card.querySelector('[data-with]').value }); render(await call('list'));
