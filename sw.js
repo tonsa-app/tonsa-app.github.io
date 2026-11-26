@@ -8,11 +8,12 @@ self.addEventListener('push', (e) => {
     body: d.body || '',
     icon: '/icon.png',
     badge: '/favicon.png',
-    tag: 'tonsa-' + (d.order_id || ''),
+    tag: 'tonsa-' + (d.order_id || d.url || ''),
     renotify: true,
     requireInteraction: true,
     vibrate: [90, 60, 90, 60, 90, 140, 600], // اهتزاز Tonsa المميز
-    data: { url: '/o/?id=' + (d.order_id || '') },
+    // تنبيهات بطاقة الولاء تجي معها رابط البطاقة
+    data: { url: d.url ? d.url.replace(/^https:\/\/tonsa-app\.github\.io/, '') : '/o/?id=' + (d.order_id || '') },
     dir: 'rtl', lang: 'ar',
   }));
 });

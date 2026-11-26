@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ملصق بطاقة الأختام — Tonsa</title>
+<link rel="icon" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="/loyal.js"></script>
+<style>
+*{box-sizing:border-box}html,body{margin:0}
+body{background:#e9e9ee;font:17px/1.5 "IBM Plex Sans Arabic",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:20px}
+.bar{display:flex;gap:10px;margin-bottom:16px}
+.bar button{font:700 16px/1 inherit;font-family:inherit;border:0;border-radius:99px;padding:14px 22px;background:#E5303C;color:#fff;cursor:pointer}
+.page{width:148mm;min-height:210mm;border-radius:6mm;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:12mm 10mm;gap:6mm;box-shadow:0 10px 40px rgba(0,0,0,.2);position:relative}
+.page h1{margin:0;font-size:30px;line-height:1.25;text-align:center}
+.page .sub{margin:0;font-size:17px;opacity:.85;text-align:center}
+.qrbox{background:#fff;border-radius:6mm;padding:6mm;width:62mm;color:#111;text-align:center}
+.qrbox svg{display:block;width:100%;height:auto}.qrbox b{display:block;margin-top:3mm;font-size:15px}
+.foot{margin-top:auto;font-size:12px;opacity:.6}
+.cardwrap{transform:scale(.86);transform-origin:top center;margin-bottom:-24mm;pointer-events:none}
+.cardwrap .lc-flipbtn,.cardwrap .lc-back{display:none}
+@media print{body{background:#fff;padding:0}.bar{display:none}.page{box-shadow:none;border-radius:0;width:148mm;height:210mm}@page{size:A5;margin:0}}
+</style></head><body>
+<div class="bar"><button onclick="print()">🖨️ اطبع</button></div>
+<div class="page" id="page"><h1 id="h">لحظة…</h1></div>
+<script>
+document.head.insertAdjacentHTML('beforeend','<style>'+LoyalCard.css+'</style>');
+const SB='https://mqwtgwqyohrrvfjqwtgm.supabase.co', KEY='sb_publishable_Dudu901qJs-L-_JqynRQ6Q_dYUVj0vX';
+const shop=(new URLSearchParams(location.search).get('s')||'').replace(/[^0-9]/g,'');
+const D=x=>String(x).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const esc=t=>String(t??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+(async()=>{
+  const j=await fetch(`${SB}/rest/v1/rpc/loyalty_shop`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify({p_shop:shop})}).then(r=>r.ok?r.json():null).catch(()=>null);
+  if(!j){document.getElementById('h').textContent='ما لقينا المحل';return;}
+  const cfg=j.cfg, p=LoyalCard.palette(cfg.color,cfg.accent,cfg.ink);
+  const page=document.getElementById('page');
+  page.style.background=/^#[0-9a-f]{6}$/i.test(cfg.color2||'')?`linear-gradient(160deg,${p.bg},${cfg.color2})`:p.bg;
+  page.style.color=p.ink;
+  const q=qrcode(0,'M');q.addData(`https://tonsa-app.github.io/l/?s=${shop}`);q.make();
+  const sample={cfg,stamps:Math.min(cfg.goal-1,(cfg.bonus||0)+3),rewards:0,shop:j.shop};
+  page.innerHTML=`<h1>${esc(cfg.title||j.shop.name)}</h1>
+    <p class="sub">اجمع ${D(cfg.goal)} أختام وخذ <b>${esc(cfg.reward_ar)}</b></p>
+    <div class="cardwrap">${LoyalCard.html(sample,{ar:true,qr:false,width:300})}</div>
+    <div class="qrbox">${q.createSvgTag({cellSize:4,margin:0,scalable:true})}<b>امسح بكاميرا جوالك وخذ بطاقتك</b></div>
+    <p class="sub">${cfg.bonus>0?`وتبدأ بطاقتك بـ ${D(cfg.bonus)} ${cfg.bonus>1?'أختام':'ختم'} هدية 🎁`:'ما تحتاج تحمّل أي تطبيق'}</p>
+    <div class="foot">Tonsa</div>`;
+  document.title='ملصق '+j.shop.name;
+})();
+</script></body></html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>بوست بطاقة الأختام — Tonsa</title>
+<link rel="icon" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<script src="/loyal.js"></script>
+<style>
+*{box-sizing:border-box}html,body{margin:0}
+body{background:#1b1b1f;color:#fff;font:17px/1.5 "IBM Plex Sans Arabic",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:20px;gap:18px}
+h2{margin:6px 0 0;font-size:18px}
+.btn{font-family:inherit;font-weight:700;font-size:16px;border:0;border-radius:99px;padding:14px 22px;background:#E5303C;color:#fff;cursor:pointer}
+.frame{overflow:hidden;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.art{width:1080px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:54px;padding:80px;text-align:center;transform-origin:top right}
+.art h1{margin:0;font-size:84px;line-height:1.2}
+.art .sub{margin:0;font-size:46px;opacity:.9}
+.art .card{transform:scale(2.3);transform-origin:center;margin:150px 0}
+.art .card .lc-flipbtn,.art .card .lc-back{display:none}
+.art .foot{font-size:34px;opacity:.75}
+.post{height:1080px}.story{height:1920px}
+.story .card{margin:260px 0}
+</style></head><body>
+<h2>بوست انستقرام (مربع)</h2>
+<div class="frame" id="f1"></div>
+<button class="btn" data-k="post">⬇️ حمّل البوست</button>
+<h2>ستوري</h2>
+<div class="frame" id="f2"></div>
+<button class="btn" data-k="story">⬇️ حمّل الستوري</button>
+<script>
+document.head.insertAdjacentHTML('beforeend','<style>'+LoyalCard.css+'</style>');
+const SB='https://mqwtgwqyohrrvfjqwtgm.supabase.co', KEY='sb_publishable_Dudu901qJs-L-_JqynRQ6Q_dYUVj0vX';
+const shop=(new URLSearchParams(location.search).get('s')||'').replace(/[^0-9]/g,'');
+const D=x=>String(x).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const esc=t=>String(t??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const nodes={};
+(async()=>{
+  const j=await fetch(`${SB}/rest/v1/rpc/loyalty_shop`,{method:'POST',headers:{'Content-Type':'application/json',apikey:KEY},body:JSON.stringify({p_shop:shop})}).then(r=>r.ok?r.json():null).catch(()=>null);
+  if(!j){document.body.insertAdjacentHTML('afterbegin','<p>ما لقينا المحل</p>');return;}
+  const cfg=j.cfg, p=LoyalCard.palette(cfg.color,cfg.accent,cfg.ink);
+  const bg=/^#[0-9a-f]{6}$/i.test(cfg.color2||'')?`linear-gradient(160deg,${p.bg},${cfg.color2})`:`radial-gradient(circle at 30% 20%,${p.bg},${p.bg})`;
+  const sample={cfg,stamps:Math.min(cfg.goal-1,(cfg.bonus||0)+4),rewards:0,shop:j.shop};
+  for(const [k,id,scale] of [['post','f1',.32],['story','f2',.2]]){
+    const a=document.createElement('div');a.className='art '+k;a.style.background=bg;a.style.color=p.ink;
+    a.innerHTML=`<h1>${esc(cfg.title||j.shop.name)}</h1><p class="sub">اجمع ${D(cfg.goal)} أختام وخذ ${esc(cfg.reward_ar)} 🎁</p>
+      <div class="card">${LoyalCard.html(sample,{ar:true,qr:false,width:300})}</div>
+      <p class="sub">امسح الباركود عند الكاشير وخذ بطاقتك</p><div class="foot">${esc(j.shop.name)}</div>`;
+    const f=document.getElementById(id);f.style.width=1080*scale+'px';f.style.height=(k==='post'?1080:1920)*scale+'px';
+    a.style.transform=`scale(${scale})`;f.appendChild(a);nodes[k]=a;
+  }
+})();
+document.querySelectorAll('.btn').forEach(b=>b.onclick=async()=>{
+  const a=nodes[b.dataset.k]; if(!a||!window.htmlToImage) return;
+  b.disabled=true;const old=b.textContent;b.textContent='لحظة…';
+  try{
+    const url=await htmlToImage.toPng(a,{width:1080,height:b.dataset.k==='post'?1080:1920,style:{transform:'none'},pixelRatio:1,cacheBust:true});
+    const l=document.createElement('a');l.href=url;l.download=`tonsa-${b.dataset.k}.png`;l.click();
+  }catch(e){alert('ما قدرنا نجهز الصورة، جرّب مرة ثانية');}
+  b.textContent=old;b.disabled=false;
+});
+</script></body></html>

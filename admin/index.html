@@ -101,11 +101,11 @@ function planOf(c) {
   if (paid > now) return c.plan === 'pro' ? ['pro', 'الاحترافية', `لين ${date(c.paid_until)} (باقي ${days(c.paid_until)} يوم)`]
                                          : ['basic', 'الأساسية', `لين ${date(c.paid_until)} (باقي ${days(c.paid_until)} يوم)`];
   if (trial > now) return ['trial', 'تجربة', `تنتهي ${date(c.trial_until)} (باقي ${days(c.trial_until)} يوم)`];
-  if (c.loyalty_until && Date.parse(c.loyalty_until) > now) return ['basic', 'ولاء بس', `بطاقة الولاء لين ${date(c.loyalty_until)} (باقي ${days(c.loyalty_until)} يوم)`];
+  if (c.loyalty_until && Date.parse(c.loyalty_until) > now) return ['basic', c.loyalty_tier === 'pro' ? 'ولاء احترافية' : 'ولاء أساسية', `بطاقة الولاء لين ${date(c.loyalty_until)} (باقي ${days(c.loyalty_until)} يوم)`];
   return ['none', 'منتهي', 'ما يقدر ينشئ طلبات'];
 }
 
-const planLabel = (p) => p === 'pro' ? 'الباقة الاحترافية' : p === 'loyalty' ? 'بطاقة الولاء' : 'الباقة الأساسية';
+const planLabel = (p) => p === 'pro' ? 'الباقة الاحترافية' : p === 'loyalty' ? 'الولاء الأساسية (٣٩)' : p === 'loyalty_pro' ? 'الولاء الاحترافية (٥٩)' : 'الباقة الأساسية';
 function welcome(c) {
   return `أهلًا ${c.name} 👋\nحسابكم في Tonsa جاهز:\n\n1) حمّلوا تطبيق Tonsa من App Store\n2) افتحوا التطبيق واضغطوا "للمحلات"\n3) رمز المحل: ${c.code}\n4) الرقم السري: ${c.staff_pin}\n\nعندكم تجربة مجانية ١٤ يوم بكل المميزات.\nأي سؤال كلمونا هنا 🙏`;
 }
@@ -141,7 +141,7 @@ function render(data) {
       ${siblings.length ? `<p class="meta">🏪 فروعه: ${siblings.map(esc).join('، ')} <button class="soft" style="min-height:34px;padding:0 10px;font-size:14px" data-unlink="${c.id}">افصل</button></p>` : ''}
       <details style="margin-top:8px"><summary>فعّل باقة بعد الدفع</summary>
         <div class="grid" style="margin:8px 0">
-          <select data-plan><option value="pro">الاحترافية</option><option value="basic">الأساسية</option><option value="loyalty">بطاقة الولاء (٣٩)</option></select>
+          <select data-plan><option value="pro">الاحترافية</option><option value="basic">الأساسية</option><option value="loyalty">الولاء الأساسية (٣٩)</option><option value="loyalty_pro">الولاء الاحترافية (٥٩)</option></select>
           <select data-months><option value="1">شهر</option><option value="3">٣ شهور</option><option value="6">٦ شهور</option><option value="12">سنة (يدفع ١٠ شهور)</option></select>
         </div>
         <button class="gold" style="width:100%" data-activate="${c.id}">فعّل</button>

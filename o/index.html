@@ -197,6 +197,7 @@ async function loadCard(){
   if(key===lyKey) return; lyKey=key;
   const L=$('loyal'); L.hidden=false;
   L.innerHTML=LoyalCard.html(c,{ar:isAr,qr:true,prev:lyShown>=0?lyShown:null,wash:!!(lastJ&&lastJ.kind==='carwash')});
+  LoyalCard.attach(L);
   lyShown=c.stamps;
 }
 async function load(){
