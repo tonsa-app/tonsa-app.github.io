@@ -49,6 +49,20 @@ button,.btn{display:flex;align-items:center;justify-content:center;gap:8px;width
 .ok{color:#1E8E3E;font-weight:700}
 :focus-visible{outline:3px solid var(--saffron);outline-offset:3px}
 [hidden]{display:none!important}
+/* بطاقة الأختام: تذكرة مثقّبة بلون المحل */
+.loyal{position:relative;z-index:1;width:100%;max-width:340px;margin-top:16px;border-radius:22px;padding:16px 16px 14px;color:#fff;
+ background:var(--ly,#1B1418);box-shadow:0 10px 26px rgba(0,0,0,.18);overflow:hidden}
+.loyal::before,.loyal::after{content:"";position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--ground,#F2F2F7);transform:translateY(-50%)}
+.loyal::before{left:-9px}.loyal::after{right:-9px}
+.ly-top{display:flex;justify-content:space-between;align-items:baseline;font-size:15px}.ly-top span{opacity:.8;font-variant-numeric:tabular-nums}
+.ly-stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0 12px}
+.ly-stamps i{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:22px;border:2px dashed rgba(255,255,255,.35)}
+.ly-stamps i.on{border:0;background:rgba(255,255,255,.95);box-shadow:inset 0 0 0 3px var(--saffron,#F5B82E)}
+.ly-stamps i.on.pop{animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{0%{transform:scale(.2) rotate(-25deg)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.ly-stamps i.on.pop{animation:none}}
+.ly-foot{font-size:14px;opacity:.92}
+.ly-gift{margin-top:10px;background:var(--saffron,#F5B82E);color:#2B1A00;border-radius:14px;padding:10px 12px;font-weight:800;text-align:center}
 .mplate{direction:ltr;display:grid;grid-template-columns:1fr 1fr 34px;border:2.5px solid #111;border-radius:10px;overflow:hidden;background:#fff;color:#111;width:250px;margin:8px auto 0;font-variant-numeric:tabular-nums}
 .mplate .c{display:grid;grid-template-rows:1fr 1fr;border-right:2px solid #111;text-align:center}
 .mplate .c span{font-weight:700;font-size:26px;letter-spacing:3px;min-height:44px;display:grid;place-items:center}
@@ -72,6 +86,11 @@ footer a{color:inherit}
 </main>
 <div class="track" id="track" role="img" aria-label="مرحلة طلبك"><div>استلمنا</div><div>نحضّره</div><div>جاهز</div><div>استلمته</div></div>
 <div class="bill" id="bill" hidden></div>
+<section class="loyal" id="loyal" hidden aria-labelledby="lyT">
+ <div class="ly-top"><b id="lyT">بطاقة الأختام</b><span id="lyCount"></span></div>
+ <div class="ly-stamps" id="lyStamps"></div>
+ <div class="ly-foot" id="lyFoot"></div>
+</section>
 <div class="rate hidden" id="rate">
   <div id="rateQ"><b>وش رأيك بطلبك؟</b><div class="faces">
     <button data-r="1" aria-label="تقييم 1 من 5">😞</button><button data-r="2" aria-label="تقييم 2 من 5">😕</button><button data-r="3" aria-label="تقييم 3 من 5">😐</button><button data-r="4" aria-label="تقييم 4 من 5">🙂</button><button data-r="5" aria-label="تقييم 5 من 5">😍</button></div></div>
@@ -108,7 +127,7 @@ const EN={'وش رأيك بطلبك؟':'How was your order?','⭐ قيّمنا �
 'الرابط ناقص':'Incomplete link','امسح الكود عند الكاشير مرة ثانية':'Scan the code at the counter again','ما لقينا الطلب':'Order not found','تأكد من الكود عند الكاشير':'Check the code at the counter',
 'طلب ':'Order ','سيارتك':'Your car','استلمناها':'Received','نغسلها':'Washing','جاهزة':'Ready','استلمتها':'Picked up','استلمنا سيارتك':'We got your car','بنبدأ عليها الحين':'We\'ll start on it now','نغسل سيارتك 🧽':'Washing your car 🧽','بنرسل لك تنبيه أول ما تخلص':'We\'ll alert you as soon as it\'s done','سيارتك جاهزة 🚗✨':'Your car is ready 🚗✨','تفضل استلمها':'Come pick it up','الله يسلمك!':'Drive safe!','وش رأيك بالغسيل؟':'How was the wash?','المجموع':'Total','💵 الدفع عند السيارة':'💵 Pay at the car','ر.س':'SAR','انلغى الطلب ':'Order cancelled','لحظة…':'One moment…','التنبيهات مقفلة. افتح إعدادات المتصفح واسمح بالتنبيهات لهذا الموقع.':'Notifications are blocked. Open your browser settings and allow notifications for this site.',
 'ما قدرنا نفعّل التنبيه على هذا الجوال. خلّ الصفحة مفتوحة وبتسمع النداء.':'We couldn\'t turn on alerts on this phone. Keep this page open and you\'ll hear the call.',
-'🔔 جرّب مرة ثانية':'🔔 Try again','📷 احفظ التذكرة صورة':'📷 Save ticket as image','خلّ هذي الصفحة مفتوحة، وبتسمع النداء أول ما يجهز طلبك.':'Keep this page open and you\'ll hear the call when your order is ready.'};
+'🔔 جرّب مرة ثانية':'🔔 Try again','بطاقة الأختام':'Stamp card','📷 احفظ التذكرة صورة':'📷 Save ticket as image','خلّ هذي الصفحة مفتوحة، وبتسمع النداء أول ما يجهز طلبك.':'Keep this page open and you\'ll hear the call when your order is ready.'};
 // لغات العمالة: أوردو، هندي، فلبيني، بنغالي (اللي ما ترجمناه يطلع إنقليزي)
 const MORE={
 ur:{'رقم طلبك':'آپ کا آرڈر نمبر','سيارتك':'آپ کی گاڑی','استلمنا':'موصول','نحضّره':'تیاری میں','جاهز':'تیار','استلمته':'وصول کر لیا','استلمناها':'موصول','نغسلها':'دھلائی','جاهزة':'تیار','استلمتها':'وصول کر لی',
@@ -179,6 +198,27 @@ function theme(t,logo){
     i.style.width='32px'; i.style.height='32px';
   }
 }
+// بطاقة الأختام: جوال العميل له رقم ثابت، ونجمع أختامه عند المحل
+const ICON={cup:'☕',iced:'🧋',burger:'🍔',pizza:'🍕',croissant:'🥐',donut:'🍩',icecream:'🍦',car:'🚗',drop:'💧',sparkle:'✨',star:'⭐',heart:'❤️'};
+const DEV=(()=>{try{let d=localStorage.getItem('tonsa-dev');if(!d){d=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2)).replace(/[^A-Za-z0-9-]/g,'');localStorage.setItem('tonsa-dev',d);}return d;}catch(e){return null;}})();
+let lyShown=-1, lyKey='', lyStatus=null;
+async function loadCard(){
+  if(!DEV) return;
+  const c=await rpc('get_card',{p_order:id,p_device:DEV});
+  if(!c||!c.on){ $('loyal').hidden=true; return; }
+  const cfg=c.cfg, goal=cfg.goal, n=Math.min(c.stamps,goal), key=n+'/'+c.rewards;
+  if(key===lyKey) return; lyKey=key;
+  const L=$('loyal'); L.hidden=false; if(/^#[0-9a-fA-F]{6}$/.test(cfg.color)) L.style.setProperty('--ly',cfg.color);
+  const box=$('lyStamps'); box.textContent='';
+  for(let i=0;i<goal;i++){ const s=document.createElement('i'); if(i<n){ s.className='on'+(lyShown>=0&&i>=lyShown?' pop':''); s.textContent=ICON[cfg.icon]||'☕'; } box.appendChild(s); }
+  box.setAttribute('role','img'); box.setAttribute('aria-label',isAr?`${n} أختام من ${goal}`:`${n} of ${goal} stamps`);
+  lyShown=n;
+  $('lyCount').textContent=isAr?`${ard(n)} من ${ard(goal)}`:`${n} / ${goal}`;
+  const reward=isAr?cfg.reward_ar:cfg.reward_en, left=goal-n;
+  $('lyFoot').textContent=isAr?`باقي ${ard(left)} وتاخذ: ${reward}`:`${left} more for: ${reward}`;
+  const old=L.querySelector('.ly-gift'); if(old) old.remove();
+  if(c.rewards>0){ const g=document.createElement('div'); g.className='ly-gift'; g.textContent=isAr?`🎁 عندك مكافأة: ${reward}. قلها للكاشير`:`🎁 You have a reward: ${reward}. Tell the cashier`; L.appendChild(g); }
+}
 async function load(){
   if(!/^[0-9a-f-]{36}$/i.test(id)){ $('num').textContent='—'; $('title').textContent=T('الرابط ناقص'); $('sub').textContent=T('امسح الكود عند الكاشير مرة ثانية'); return; }
   const j=await rpc('get_order',{p_id:id});
@@ -188,6 +228,7 @@ async function load(){
     $('title').textContent=T('ما لقينا الطلب'); $('sub').textContent=T('تأكد من الكود عند الكاشير'); return;
   }
   lastJ=j;
+  if(j.status!==lyStatus){ lyStatus=j.status; setTimeout(loadCard, j.status==='ready'?1500:0); }
   $('num').textContent=String(j.number??'—');
   if(j.kind==='carwash') wash(j);
   if(j.cafe&&j.cafe.name){ $('shop').textContent=j.cafe.name; document.title=T('طلب ')+j.number+' — '+j.cafe.name; }
