@@ -9,18 +9,23 @@ const LoyalCard=(()=>{
   const esc=t=>String(t??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const STORE='https://mqwtgwqyohrrvfjqwtgm.supabase.co/storage/v1/object/public/loyalty/';
   const img=u=>(u||'').startsWith(STORE)?u:'';
+  const lr=h=>{const c=hex(h).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
+  const cr=(x,y)=>{const A=lr(x),B=lr(y);return(Math.max(A,B)+.05)/(Math.min(A,B)+.05)};
 
-  // ألوان البطاقة: لون الخلفية، ولون الختم والكلام لو المحل اختارهم
+  // ألوان البطاقة (نفس LoyaltyPalette في التطبيق)
+  // bg: البطاقة، strip: شريط الأختام، m: لون الختم، label: العناوين الصغيرة، ghost: الخانات الفاضية
   function palette(bg,accent,inkC){
     bg=ok(bg)?bg:'#121715';
     const light=lum(bg)>0.6;
-    let m=light?'#1F1A17':'#F7F3EA', a=light?'#A97A30':'#D6B77B';
-    if(ok(accent)){ m=accent; a=lum(accent)>0.5?mix(accent,'#000000',0.32):mix(accent,'#FFFFFF',0.38); }
     const ink=ok(inkC)?inkC:(light?'#1A1715':'#FFFFFF');
-    const lr=h=>{const c=hex(h).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
-    const cr=(x,y)=>{const A=lr(x),B=lr(y);return(Math.max(A,B)+.05)/(Math.min(A,B)+.05)};
-    const lab=ok(accent)?m:a;
-    return{bg,light,m,a,ink,label:cr(lab,bg)>=3?lab:mix(ink,bg,0.22),dim:mix(bg,light?'#000000':'#FFFFFF',light?0.09:0.1)};
+    const m=ok(accent)?accent:(light?'#1F1A17':'#F4EDE0');
+    const a=lum(m)>0.5?mix(m,'#000000',0.32):mix(m,'#FFFFFF',0.38);
+    const strip=mix(bg,ink,light?0.06:0.075);
+    const lab=ok(accent)?m:(light?'#8A6424':'#D9BC84');
+    return{bg,light,m,a,ink,strip,
+      label:cr(lab,bg)>=3?lab:mix(ink,bg,0.3),
+      ghost:mix(strip,ink,0.2),line:mix(strip,ink,0.34),
+      dim:mix(bg,light?'#000000':'#FFFFFF',light?0.09:0.1)};
   }
 
   // الخطوط (كلها مجانية للاستخدام التجاري)
@@ -30,10 +35,10 @@ const LoyalCard=(()=>{
   function font(k){
     const f=FONTS[k]; if(!f) return '';
     if(!loaded[k]){loaded[k]=1;const l=document.createElement('link');l.rel='stylesheet';l.href=`https://fonts.googleapis.com/css2?family=${f[1]}&display=swap`;document.head.appendChild(l);}
-    return `'${f[0]}',`;
+    return `'${f[0]}'`;
   }
 
-  // النقشات: مربع ٤٠×٤٠ يتكرر
+  // النقشات: مربع ٤٠×٤٠ يتكرر (تطلع في شريط الأختام بس)
   const PAT={
     dots:'<circle cx="10" cy="10" r="2.2"/><circle cx="30" cy="30" r="2.2"/>',
     checks:'<rect width="20" height="20"/><rect x="20" y="20" width="20" height="20"/>',
@@ -44,17 +49,15 @@ const LoyalCard=(()=>{
   };
   function patternUrl(k,ink){
     if(!PAT[k]) return '';
-    const s=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="${ink}" stroke="${ink}" opacity="0.09">${PAT[k]}</svg>`;
+    const s=`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="${ink}" stroke="${ink}" opacity="0.1">${PAT[k]}</svg>`;
     return `url('data:image/svg+xml,${encodeURIComponent(s).replace(/'/g,'%27')}')`;
   }
 
-  // المستويات (بعدد البطاقات اللي كمّلها) والإنجازات (بعدد الزيارات)
-  const TIERS=[{min:6,ar:'ذهبي',en:'Gold',c:'#E5B84C',e:'🥇'},{min:3,ar:'فضي',en:'Silver',c:'#C3CAD3',e:'🥈'},{min:1,ar:'برونزي',en:'Bronze',c:'#CD7F32',e:'🥉'}];
+  // المستويات (بعدد البطاقات اللي كمّلها): شارة معدنية بدون إيموجي
+  const TIERS=[{min:6,ar:'ذهبي',en:'Gold',g:'#F7E7B0,#C9982F'},{min:3,ar:'فضي',en:'Silver',g:'#F4F6F8,#A7AFB9'},{min:1,ar:'برونزي',en:'Bronze',g:'#F0C29A,#9A582A'}];
   const tierOf=c=>{const done=(c.redeemed||0)+(c.rewards||0);return TIERS.find(t=>done>=t.min)||null};
   const nextTier=c=>{const done=(c.redeemed||0)+(c.rewards||0);const t=[...TIERS].reverse().find(t=>done<t.min);return t?{t,left:t.min-done}:null};
-  const BADGES=[{v:1,e:'👋',ar:'أول زيارة',en:'First visit'},{v:5,e:'⭐',ar:'٥ زيارات',en:'5 visits'},{v:10,e:'🔥',ar:'١٠ زيارات',en:'10 visits'},
-    {v:25,e:'💎',ar:'٢٥ زيارة',en:'25 visits'},{v:50,e:'👑',ar:'٥٠ زيارة',en:'50 visits'},{days:365,e:'🎂',ar:'عميل سنة',en:'1 year'}];
-  const badgesOf=c=>BADGES.filter(b=>b.v?(c.visits||0)>=b.v:(c.since&&Date.now()-Date.parse(c.since)>=b.days*864e5));
+  const badgesOf=()=>[];
 
   // مفتوح الحين؟ (يدعم الدوام اللي يعدّي نص الليل)
   function hoursState(h){
@@ -64,10 +67,13 @@ const LoyalCard=(()=>{
     return{open,from:m[1]+':'+m[2],to:m[3]+':'+m[4]};
   }
 
+  // opt: {m, a, h} ألوان الأجزاء. h:'none' يشيل الثقوب
   function glyph(icon,on,p,size,opt){
     const parts=ART[icon]||ART.cup; let s='';
     for(const q of parts){
-      const role=q[1], fill=role==='h'?p.bg:(on?(role==='a'?(opt&&opt.a||p.a):(opt&&opt.m||p.m)):p.dim);
+      const role=q[1];
+      const fill=role==='h'?(opt&&opt.h||p.bg):(on?(role==='a'?(opt&&opt.a||p.a):(opt&&opt.m||p.m)):p.dim);
+      if(fill==='none') continue;
       if(q[0]==='p'){let d='';for(let i=0;i<q[2].length;i+=2)d+=(i?'L':'M')+q[2][i]+' '+q[2][i+1];s+=`<path d="${d}Z" fill="${fill}"/>`}
       else if(q[0]==='c')s+=`<circle cx="${q[2]}" cy="${q[3]}" r="${q[4]}" fill="${fill}"/>`;
       else s+=`<rect x="${q[2]}" y="${q[3]}" width="${q[4]}" height="${q[5]}" rx="${q[6]}" fill="${fill}"/>`;
@@ -75,94 +81,108 @@ const LoyalCard=(()=>{
     return `<svg viewBox="-2 -2 104 104" width="${size}" height="${size}" aria-hidden="true">${s}</svg>`;
   }
 
-  // ختم واحد: صورة المحل أو الشكل المرسوم، وآخر ختم (المكافأة) له شكل مميز
+  // ميلان كل ختم (ثابت) عشان يبان مختوم باليد
+  const ROT=[-6,4,-3,7,-5,2,-8,5,-2,6,-4,3,-7,1,-5,8,-3,4,-6,2];
+
+  // خانة ختم: مختوم، فاضي، أو خانة المكافأة
   function stamp(i,n,goal,cfg,p,size,prev){
     const on=i<n, isLast=i===goal-1, last=cfg.last||'gift';
     const anim=on&&prev!=null&&i>=prev?` lc-in-${cfg.anim||'pop'}`:'';
     const on1=img(cfg.stamp_img), off1=img(cfg.stamp_off_img);
-    let inner;
-    if(!on&&isLast&&last==='gift') inner=glyph('gift',true,p,size*0.86,{m:mix(p.label,p.bg,0.45),a:p.label});
-    else if(on1) inner=`<img src="${esc(!on&&off1?off1:on1)}" alt="" width="${size}" height="${size}" class="lc-img${!on&&!off1?' lc-off':''}">`;
-    else inner=glyph(cfg.icon,on,p,size);
-    const star=isLast&&last==='star'?' lc-star':'';
-    return `<span class="lc-st${anim}${star}" style="width:${size}px;height:${size}px">${inner}</span>`;
+    let inner, cls='lc-st', st=`width:${size}px;height:${size}px`;
+    if(on1){
+      inner=`<img src="${esc(!on&&off1?off1:on1)}" alt="" class="lc-img${!on&&!off1?' lc-off':''}">`; cls+=' lc-st-img';
+      if(on) st+=`;transform:rotate(${ROT[i%20]}deg)`;
+    }else if(on){
+      inner=glyph(cfg.icon,true,p,Math.round(size*.56),{m:p.bg,a:mix(p.bg,p.m,.42),h:p.m}); cls+=' lc-st-on';
+      st+=`;transform:rotate(${ROT[i%20]}deg)`;
+    }else if(isLast&&last!=='same'){
+      inner=glyph(last==='star'?'star':'gift',true,p,Math.round(size*.5),{m:p.label,a:p.label,h:'none'}); cls+=' lc-st-goal'+(last==='star'?' lc-glow':'');
+    }else{
+      inner=glyph(cfg.icon,true,p,Math.round(size*.5),{m:p.ghost,a:p.ghost,h:'none'}); cls+=' lc-st-off';
+    }
+    return `<span class="${cls}${anim}" style="${st}">${inner}</span>`;
   }
 
   function stampsHTML(c,cfg,p,o,W){
     const goal=cfg.goal, n=Math.min(c.stamps,goal), lay=cfg.layout||'rows';
     if(lay==='circle'){
-      const D=Math.min(W,250), r=D/2-24, size=Math.max(22,Math.min(44,Math.floor(2*Math.PI*r/goal*0.78)));
+      const D=Math.min(W,236), r=D/2-22, size=Math.max(22,Math.min(40,Math.floor(2*Math.PI*r/goal*0.74)));
       let s=`<div class="lc-ring" style="width:${D}px;height:${D}px">`;
       for(let i=0;i<goal;i++){const a=-Math.PI/2+(o.ar?-1:1)*2*Math.PI*i/goal;s+=`<div class="lc-pos" style="left:${D/2+r*Math.cos(a)-size/2}px;top:${D/2+r*Math.sin(a)-size/2}px">${stamp(i,n,goal,cfg,p,size,o.prev)}</div>`;}
       return s+`<div class="lc-ring-mid"><b>${o.D(n)}</b><small>${o.ar?'من '+o.D(goal):'of '+goal}</small></div></div>`;
     }
     if(lay==='road'){
-      const cols=5, rows=Math.ceil(goal/cols), pad=24, step=(W-pad*2)/(cols-1), H=rows*58, size=34;
-      const P=[...Array(goal)].map((_,i)=>{const r=Math.floor(i/cols);let cc=r%2?cols-1-(i%cols):i%cols;if(o.ar)cc=cols-1-cc;return[pad+cc*step,29+r*58]});
+      const cols=5, rows=Math.ceil(goal/cols), pad=22, step=(W-pad*2)/(cols-1), H=rows*60, size=36;
+      const P=[...Array(goal)].map((_,i)=>{const r=Math.floor(i/cols);let cc=r%2?cols-1-(i%cols):i%cols;if(o.ar)cc=cols-1-cc;return[pad+cc*step,30+r*60]});
       let d=`M${P[0][0]} ${P[0][1]}`;
       for(let i=1;i<P.length;i++){const[a,b]=[P[i-1],P[i]];if(a[1]!==b[1]){const k=a[0]>W/2?30:-30;d+=` C${a[0]+k} ${a[1]} ${b[0]+k} ${b[1]} ${b[0]} ${b[1]}`}else d+=` L${b[0]} ${b[1]}`}
-      let s=`<div class="lc-road" style="width:${W}px;height:${H}px"><svg width="${W}" height="${H}" aria-hidden="true"><path d="${d}" fill="none" stroke="${p.ink}" stroke-opacity=".16" stroke-width="12" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${p.ink}" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="5 6"/></svg>`;
+      let s=`<div class="lc-road" style="width:${W}px;height:${H}px"><svg width="${W}" height="${H}" aria-hidden="true"><path d="${d}" fill="none" stroke="${p.line}" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/></svg>`;
       P.forEach(([x,y],i)=>{s+=`<div class="lc-pos" style="left:${x-size/2}px;top:${y-size/2}px">${stamp(i,n,goal,cfg,p,size,o.prev)}</div>`});
       return s+'</div>';
     }
-    const rows=goal<=6?1:goal<=14?2:3, per=Math.ceil(goal/rows), size=Math.min(52,Math.floor(W/per)-8);
+    const rows=goal<=5?1:goal<=12?2:3, per=Math.ceil(goal/rows), gap=10, size=Math.min(50,Math.floor((W-(per-1)*gap)/per));
     let g='<div class="lc-grid">';
     for(let r=0,i=0;r<rows;r++){g+='<div class="lc-row">';for(let k=0;k<per&&i<goal;k++,i++)g+=stamp(i,n,goal,cfg,p,size,o.prev);g+='</div>';}
     return g+'</div>';
   }
 
-  // c: نتيجة get_card / loyalty_join / loyalty_shop. o: {ar, qr, prev, wash, preview}
+  const INFO='<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="10" cy="5.6" r="1.4" fill="currentColor"/><rect x="8.8" y="8.4" width="2.4" height="7.6" rx="1.2" fill="currentColor"/></svg>';
+  const BACK='<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+
+  // c: نتيجة get_card / loyalty_join / loyalty_shop. o: {ar, qr, prev, wash, width}
   function html(c,o){
     const cfg=c.cfg, goal=cfg.goal, n=Math.min(c.stamps||0,goal), ar=o.ar, p=palette(cfg.color,cfg.accent,cfg.ink);
     const D=x=>ar?String(x).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]):String(x);
     const ff=font(cfg.font);
-    const shop=c.shop||{}, reward=ar?cfg.reward_ar:cfg.reward_en, left=goal-n, wash=o.wash??!!shop.wash;
+    const shop=c.shop||{}, reward=(ar?cfg.reward_ar:cfg.reward_en)||(ar?'مشروبك علينا':'Your drink is on us'), left=goal-n, wash=o.wash??!!shop.wash;
     const tier=cfg.tiers?tierOf(c):null;
     const unit=wash?['غسلة','غسلتين','غسلات']:['طلب','طلبين','طلبات'];
     const arCount=left===1?(wash?'غسلة وحدة':'طلب واحد'):left===2?unit[1]:`${D(left)} ${left<11?unit[2]:unit[0]}`;
-    const leftTxt=c.rewards>0?(ar?'مكافأتك جاهزة 🎁':'Reward ready 🎁'):(ar?arCount:`${left} ${wash?(left===1?'wash':'washes'):(left===1?'order':'orders')}`);
-    const logo=shop.logo&&/^data:image\//.test(shop.logo)?`<img class="lc-logo" src="${esc(shop.logo)}" alt="">`:`<span class="lc-logo" style="background:${p.a}">${glyph(cfg.icon,true,p,22,{m:p.bg,a:p.bg})}</span>`;
+    const ready=c.rewards>0;
+    const leftTxt=ready?(ar?'مكافأتك جاهزة':'Reward ready'):(ar?arCount:`${left} ${wash?(left===1?'wash':'washes'):(left===1?'order':'orders')}`);
+    const logo=shop.logo&&/^data:image\//.test(shop.logo)?`<img class="lc-logo" src="${esc(shop.logo)}" alt="">`:`<span class="lc-logo" style="background:${p.m}">${glyph(cfg.icon,true,p,24,{m:p.bg,a:mix(p.bg,p.m,.42),h:p.m})}</span>`;
     const title=cfg.title||shop.name||(ar?'بطاقة الأختام':'Stamp card');
-    // الخلفية: لون أو تدرّج، وفوقه صورة ونقشة
+    const sub=cfg.title&&shop.name&&cfg.title!==shop.name?shop.name:'';
+    // شريط الأختام: صورة أو تدرّج أو لون، وفوقه النقشة
     const layers=[];
     const pat=patternUrl(cfg.pattern,p.ink); if(pat) layers.push(pat);
-    const bgi=img(cfg.bg_img); if(bgi) layers.push(`linear-gradient(${p.bg}73,${p.bg}73)`,`url('${esc(bgi)}')`);
-    const base=ok(cfg.color2)?`linear-gradient(135deg,${p.bg},${cfg.color2})`:p.bg;
-    layers.push(base);
+    const bgi=img(cfg.bg_img);
+    if(bgi) layers.push(`linear-gradient(${p.bg}8c,${p.bg}8c)`,`url('${esc(bgi)}')`);
+    else if(ok(cfg.color2)) layers.push(`linear-gradient(135deg,${mix(p.strip,cfg.color2,.25)},${cfg.color2})`);
+    else layers.push(p.strip);
     const sizes=layers.map(l=>l===pat?'40px 40px':'cover').join(',');
     const corners=cfg.corners||'round';
-    const style=`--lc-bg:${p.bg};--lc-ink:${p.ink};--lc-label:${p.label};--lc-font:${ff}inherit;background:${layers.join(',')};background-size:${sizes};background-position:center`
-      +(tier?`;box-shadow:0 0 0 3px ${tier.c},0 14px 34px rgba(0,0,0,.22)`:'');
     const shine=cfg.shine||(tier&&tier.min===6);
+    const style=`--lc-bg:${p.bg};--lc-ink:${p.ink};--lc-label:${p.label};--lc-m:${p.m};--lc-ring:${mix(p.m,p.bg,.3)};--lc-line:${p.line};--lc-ghost:${p.ghost};--lc-font:${ff||'inherit'};background:${p.bg}`;
     const cls=`lc lc-c-${corners}${shine?' lc-shine':''}`;
-    const W=o.width||300;
-    const earned=cfg.badges?badgesOf(c):[];
+    const W=Math.min(o.width||304,304);
     let qr='';
-    if(o.qr&&c.member&&window.qrcode){const q=qrcode(0,'M');q.addData('TONSA:'+c.member);q.make();qr=`<div class="lc-qr">${q.createSvgTag({cellSize:4,margin:0,scalable:true})}<b>${esc(c.member)}</b></div>`;}
+    if(o.qr&&c.member&&window.qrcode){const q=qrcode(0,'M');q.addData('TONSA:'+c.member);q.make();
+      qr=`<div class="lc-qr">${q.createSvgTag({cellSize:4,margin:0,scalable:true})}<b>${esc(String(c.member).replace(/(\d{3})(?=\d)/g,'$1 '))}</b></div>`;}
+    const head=`<div class="lc-top">${logo}<div class="lc-tt"><b class="lc-name">${esc(title)}</b>${sub?`<small>${esc(sub)}</small>`:''}</div>`;
     const front=`<div class="${cls} lc-front" style="${style}">
-      <div class="lc-top">${logo}<div class="lc-tt"><b class="lc-name">${esc(title)}</b>${cfg.title&&shop.name?`<small>${esc(shop.name)}</small>`:''}${tier?`<span class="lc-tier" style="background:${tier.c}">${tier.e} ${ar?tier.ar:tier.en}</span>`:''}</div>
-        <div class="lc-f lc-end"><small>${ar?'الأختام':'Stamps'}</small><span>${ar?`${D(n)} من ${D(goal)}`:`${n} of ${goal}`}</span></div></div>
-      <div class="lc-stamps" role="img" aria-label="${ar?`${n} أختام من ${goal}`:`${n} of ${goal} stamps`}">${stampsHTML(c,cfg,p,{...o,D},W)}</div>
-      <div class="lc-fields"><div class="lc-f"><small>${ar?'المكافأة':'Reward'}</small><span class="lc-v">${esc(reward)}</span></div><div class="lc-f lc-end"><small>${c.rewards>0?(ar?'عندك':'You have'):(ar?'باقي':'Left')}</small><span>${leftTxt}</span></div></div>
-      ${c.name?`<div class="lc-fields"><div class="lc-f"><small>${ar?'الاسم':'Name'}</small><span class="lc-person">${esc(c.name)}</span></div></div>`:''}
-      ${earned.length?`<div class="lc-badges">${earned.map(b=>`<span title="${esc(ar?b.ar:b.en)}">${b.e}</span>`).join('')}</div>`:''}
-      ${cfg.message?`<p class="lc-msg">${esc(cfg.message)}</p>`:''}
+      ${head}<div class="lc-count"><small>${ar?'الأختام':'Stamps'}</small><bdi dir="ltr"><b>${D(n)}</b><i>/${D(goal)}</i></bdi></div></div>
+      <div class="lc-strip" style="background:${layers.join(',')};background-size:${sizes};background-position:center" role="img" aria-label="${ar?`${n} أختام من ${goal}`:`${n} of ${goal} stamps`}">${stampsHTML(c,cfg,p,{...o,D},W)}</div>
+      <div class="lc-fields"><div class="lc-f"><small>${ar?'المكافأة':'Reward'}</small><span class="lc-v">${esc(reward)}</span></div><div class="lc-f lc-end"><small>${ready?(ar?'عندك':'You have'):(ar?'باقي':'Left')}</small><span${ready?' class="lc-ready"':''}>${leftTxt}</span></div></div>
+      ${c.name||tier?`<div class="lc-fields lc-f2">${c.name?`<div class="lc-f"><small>${ar?'العضو':'Member'}</small><span class="lc-v">${esc(c.name)}</span></div>`:'<span></span>'}${tier?`<div class="lc-f lc-end"><small>${ar?'المستوى':'Level'}</small><span><em class="lc-tier" style="background:linear-gradient(135deg,${tier.g})">${ar?tier.ar:tier.en}</em></span></div>`:''}</div>`:''}
       ${qr}
-      <button type="button" class="lc-flipbtn" aria-label="${ar?'اقلب البطاقة':'Flip card'}">↻ ${ar?'اقلب البطاقة':'Flip card'}</button>
+      <div class="lc-foot"><p class="lc-msg">${esc(cfg.message||'')}</p><button type="button" class="lc-flipbtn" aria-label="${ar?'تفاصيل البطاقة':'Card details'}">${INFO}</button></div>
     </div>`;
-    // ظهر البطاقة: الشروط والدوام والتواصل والإنجازات
+    // ظهر البطاقة: الدوام والتواصل والمستوى والشروط
     const hs=hoursState(cfg.hours), nt=cfg.tiers?nextTier(c):null;
     const row=(k,v)=>`<div class="lc-brow"><small>${k}</small><span>${v}</span></div>`;
     const back=`<div class="${cls} lc-back" style="${style}">
-      <div class="lc-top">${logo}<div class="lc-tt"><b class="lc-name">${esc(shop.name||title)}</b></div></div>
+      <div class="lc-top">${logo}<div class="lc-tt"><b class="lc-name">${esc(shop.name||title)}</b><small>${ar?'تفاصيل البطاقة':'Card details'}</small></div><button type="button" class="lc-flipbtn lc-x" aria-label="${ar?'ارجع للبطاقة':'Back to card'}">${BACK}</button></div>
+      <div class="lc-list">
+      ${row(ar?'طريقة الأختام':'How it works',ar?`كل ${D(goal)} أختام = ${esc(reward)}`:`Every ${goal} stamps = ${esc(reward)}`)}
       ${hs?row(ar?'الدوام':'Hours',`<span class="lc-dot" style="background:${hs.open?'#34C759':'#FF453A'}"></span>${hs.open?(ar?'مفتوح الحين':'Open now'):(ar?'مقفل الحين':'Closed now')} · <bdi>${hs.from} – ${hs.to}</bdi>`):''}
       ${cfg.phone?row(ar?'الجوال':'Phone',`<a href="tel:${esc(cfg.phone)}"><bdi>${esc(cfg.phone)}</bdi></a>`):''}
-      ${cfg.maps?row(ar?'الموقع':'Location',`<a href="${esc(cfg.maps)}" target="_blank" rel="noopener">${ar?'افتح الخريطة 📍':'Open map 📍'}</a>`):''}
-      ${cfg.tiers?row(ar?'مستواك':'Your level',tier?`${tier.e} ${ar?tier.ar:tier.en}`:(ar?'عضو':'Member'))+(nt?`<p class="lc-note">${ar?`باقي ${D(nt.left)} ${nt.left===1?'بطاقة':'بطاقات'} وتصير ${nt.t.ar} ${nt.t.e}`:`${nt.left} more cards to ${nt.t.en} ${nt.t.e}`}</p>`:''):''}
-      ${cfg.badges?`<div class="lc-brow"><small>${ar?'إنجازاتك':'Badges'}</small><div class="lc-blist">${BADGES.map(b=>`<span class="${badgesOf(c).includes(b)?'':'lc-locked'}">${b.e} ${ar?b.ar:b.en}</span>`).join('')}</div></div>`:''}
+      ${cfg.maps?row(ar?'الموقع':'Location',`<a href="${esc(cfg.maps)}" target="_blank" rel="noopener">${ar?'افتح في الخريطة':'Open in Maps'}</a>`):''}
+      ${cfg.tiers?row(ar?'مستواك':'Your level',(tier?(ar?tier.ar:tier.en):(ar?'عضو':'Member'))+(nt?` <span class="lc-note">· ${ar?`باقي ${D(nt.left)} ${nt.left===1?'بطاقة':'بطاقات'} وتصير ${nt.t.ar}`:`${nt.left} more cards to ${nt.t.en}`}</span>`:'')):''}
+      ${c.visits?row(ar?'زياراتك':'Visits',D(c.visits)):''}
       ${cfg.terms?row(ar?'الشروط':'Terms',esc(cfg.terms)):''}
-      <p class="lc-note">${ar?`كل ${D(goal)} أختام = ${esc(reward)}`:`Every ${goal} stamps = ${esc(reward)}`}</p>
-      <button type="button" class="lc-flipbtn" aria-label="${ar?'ارجع للبطاقة':'Back to card'}">↻ ${ar?'ارجع للبطاقة':'Back to card'}</button>
+      </div>
     </div>`;
     return `<div class="lc-wrap"><div class="lc-flip">${front}${back}</div></div>`;
   }
@@ -173,40 +193,51 @@ const LoyalCard=(()=>{
     if(!attach.tilt&&window.DeviceOrientationEvent){attach.tilt=1;window.addEventListener('deviceorientation',e=>{const x=Math.max(-30,Math.min(30,e.gamma||0));document.documentElement.style.setProperty('--lc-sx',(50+x*1.6)+'%')});}
   }
 
-  const css=`.lc-wrap{width:100%;max-width:340px;perspective:1200px;text-align:start}
+  const css=`.lc-wrap{width:100%;max-width:340px;perspective:1400px;text-align:start}
 .lc-flip{display:grid;transition:transform .7s cubic-bezier(.3,1.1,.4,1);transform-style:preserve-3d}
 .lc-flip>.lc{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .lc-back{transform:rotateY(180deg)}.lc-flipped{transform:rotateY(180deg)}
-.lc{position:relative;color:var(--lc-ink);border-radius:20px;padding:18px 18px 14px;box-shadow:0 14px 34px rgba(0,0,0,.22);overflow:hidden}
-.lc-c-sharp{border-radius:5px}
-.lc-c-ticket{border-radius:16px;-webkit-mask:radial-gradient(circle 13px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 13px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 13px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 13px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
-.lc-shine::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.26) 48%,rgba(255,255,255,.06) 56%,transparent 70%);background-size:260% 100%;background-position:var(--lc-sx,50%) 0;animation:lcsweep 5s ease-in-out infinite}
+.lc{position:relative;color:var(--lc-ink);border-radius:22px;overflow:hidden;box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 18px 40px -12px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.12);display:flex;flex-direction:column}
+.lc-c-sharp{border-radius:6px}
+.lc-c-ticket{border-radius:16px;-webkit-mask:radial-gradient(circle 11px at 0 72px,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 72px,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 11px at 0 72px,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 72px,#0000 98%,#000) right/51% 100% no-repeat}
+.lc-shine::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.22) 48%,rgba(255,255,255,.05) 55%,transparent 68%);background-size:260% 100%;background-position:var(--lc-sx,50%) 0;animation:lcsweep 6s ease-in-out infinite}
 @keyframes lcsweep{0%,100%{background-position:100% 0}50%{background-position:0 0}}
-.lc-top{display:flex;align-items:center;gap:10px;position:relative}.lc-logo{width:36px;height:36px;border-radius:50%;object-fit:cover;display:grid;place-items:center;flex:none}
-.lc-tt{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;line-height:1.25}
-.lc-name{font-family:var(--lc-font);font-size:19px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lc-tt small{font-size:12px;opacity:.7}
-.lc-tier{margin-top:3px;font-size:11px;font-weight:700;color:#1b1206;border-radius:99px;padding:1px 8px}
-.lc-f{display:flex;flex-direction:column;line-height:1.25;position:relative}.lc-f small{color:var(--lc-label);font-size:12px;font-weight:600}.lc-f span{font-size:19px;font-variant-numeric:tabular-nums}
-.lc-v,.lc-person{font-family:var(--lc-font)}.lc-person{font-size:22px!important}
-.lc-end{text-align:end}.lc-stamps{margin:18px 0;position:relative;display:flex;justify-content:center}
-.lc-grid{display:flex;flex-direction:column;gap:8px}.lc-row{display:flex;justify-content:center;gap:8px}
-.lc-st{display:grid;place-items:center;flex:none}.lc-st svg{display:block}.lc-img{object-fit:contain;display:block;width:100%;height:100%}.lc-off{filter:grayscale(1);opacity:.22}
-.lc-star{border-radius:50%;box-shadow:0 0 0 2px var(--lc-label),0 0 14px var(--lc-label)}
-.lc-ring,.lc-road{position:relative}.lc-road svg{position:absolute;inset:0}.lc-pos{position:absolute}
-.lc-ring-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.lc-ring-mid b{font-size:38px;line-height:1}.lc-ring-mid small{color:var(--lc-label);font-weight:600}
-.lc-in-pop{animation:lcpop .6s cubic-bezier(.3,1.6,.5,1) both}@keyframes lcpop{0%{transform:scale(.2) rotate(-20deg);opacity:0}100%{transform:none;opacity:1}}
-.lc-in-ink{animation:lcink .55s cubic-bezier(.2,1.4,.4,1) both}@keyframes lcink{0%{transform:scale(1.9) rotate(-14deg);opacity:0;filter:blur(3px)}70%{transform:scale(.9) rotate(3deg);opacity:1;filter:none}100%{transform:none}}
-.lc-in-shine{animation:lcglow 1s ease-out both}@keyframes lcglow{0%{transform:scale(.6);opacity:0;filter:brightness(3) drop-shadow(0 0 12px #fff)}100%{transform:none;opacity:1;filter:none}}
-.lc-fields{display:flex;justify-content:space-between;gap:12px;margin-top:4px}
-.lc-badges{display:flex;gap:4px;margin-top:10px;font-size:18px}
-.lc-msg{margin:12px 0 0;text-align:center;font-family:var(--lc-font);font-size:15px;opacity:.85}
-.lc-qr{margin:18px auto 0;background:#fff;border-radius:12px;padding:12px 12px 6px;width:52%;text-align:center;color:#111;position:relative}
-.lc-qr svg{display:block;width:100%;height:auto}.lc-qr b{display:block;font:500 15px/1.6 ui-monospace,Menlo,monospace;letter-spacing:1px;direction:ltr}
-.lc-flipbtn{display:block;margin:12px auto 0;background:transparent;border:0;color:var(--lc-label);font:600 13px/1 inherit;font-family:inherit;padding:8px 12px;cursor:pointer;position:relative}
-.lc-brow{display:flex;flex-direction:column;margin-top:14px;position:relative}.lc-brow small{color:var(--lc-label);font-size:12px;font-weight:600}.lc-brow span,.lc-brow a{font-size:16px;color:inherit}
-.lc-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-inline-end:6px}
-.lc-blist{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.lc-blist span{font-size:13px;background:rgba(127,127,127,.18);border-radius:99px;padding:3px 9px}.lc-locked{opacity:.35;filter:grayscale(1)}
-.lc-note{margin:12px 0 0;font-size:14px;opacity:.85;position:relative}
+.lc-top{display:flex;align-items:center;gap:11px;height:72px;padding:0 18px;box-sizing:border-box;position:relative}
+.lc-logo{width:40px;height:40px;border-radius:11px;object-fit:cover;display:grid;place-items:center;flex:none}
+.lc-tt{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
+.lc-name{font-size:17px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lc-tt small{font-size:12px;opacity:.62;margin-top:2px}
+.lc-count{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}.lc-count small,.lc-f small,.lc-brow small{color:var(--lc-label);font-size:11px;font-weight:700;letter-spacing:.02em}
+.lc-count bdi{font-variant-numeric:tabular-nums;white-space:nowrap}.lc-count b{font-size:26px;font-weight:700}.lc-count i{font-style:normal;font-size:15px;opacity:.55;font-weight:600}
+.lc-strip{padding:20px 18px;display:flex;justify-content:center;position:relative}
+.lc-grid{display:flex;flex-direction:column;gap:10px}.lc-row{display:flex;justify-content:center;gap:10px}
+.lc-st{display:grid;place-items:center;flex:none;border-radius:50%;box-sizing:border-box;position:relative}.lc-st svg{display:block}
+.lc-st-on{background:var(--lc-m);box-shadow:0 2px 5px rgba(0,0,0,.25),inset 0 -2px 0 rgba(0,0,0,.12)}
+.lc-st-on::after{content:"";position:absolute;inset:3px;border-radius:50%;border:1.2px solid var(--lc-ring);opacity:.55}
+.lc-st-off{border:1.5px dashed var(--lc-line)}
+.lc-st-goal{border:1.5px solid var(--lc-label);background:color-mix(in srgb,var(--lc-label) 12%,transparent)}
+.lc-glow{box-shadow:0 0 14px color-mix(in srgb,var(--lc-label) 55%,transparent)}
+.lc-st-img{border-radius:0}.lc-img{object-fit:contain;display:block;width:100%;height:100%}.lc-off{filter:grayscale(1);opacity:.25}
+.lc-ring,.lc-road{position:relative}.lc-road>svg{position:absolute;inset:0}.lc-pos{position:absolute}
+.lc-ring-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.lc-ring-mid b{font-size:40px;line-height:1;font-weight:700}.lc-ring-mid small{color:var(--lc-label);font-weight:700;font-size:12px;margin-top:2px}
+.lc-in-pop{animation:lcpop .6s cubic-bezier(.3,1.6,.5,1) both}@keyframes lcpop{0%{scale:.2;opacity:0}100%{scale:1;opacity:1}}
+.lc-in-ink{animation:lcink .55s cubic-bezier(.2,1.4,.4,1) both}@keyframes lcink{0%{scale:1.9;opacity:0;filter:blur(3px)}70%{scale:.92;opacity:1;filter:none}100%{scale:1}}
+.lc-in-shine{animation:lcglow 1s ease-out both}@keyframes lcglow{0%{scale:.6;opacity:0;filter:brightness(3) drop-shadow(0 0 12px #fff)}100%{scale:1;opacity:1;filter:none}}
+.lc-fields{display:flex;justify-content:space-between;gap:14px;padding:16px 18px 0}.lc-f2{padding-top:12px}
+.lc-f{display:flex;flex-direction:column;line-height:1.3;min-width:0}.lc-f span{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}
+.lc-v,.lc-name{font-family:var(--lc-font)}.lc-end{text-align:end;align-items:flex-end}.lc-ready{color:var(--lc-label)}
+.lc-tier{display:inline-block;font-style:normal;font-size:12px;font-weight:800;color:#24180a;border-radius:99px;padding:2px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.lc-qr{margin:18px auto 0;background:#fff;border-radius:14px;padding:12px 12px 4px;width:150px;text-align:center;color:#111;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.lc-qr svg{display:block;width:100%;height:auto}.lc-qr b{display:block;font:600 13px/2 ui-monospace,Menlo,monospace;letter-spacing:.06em;direction:ltr}
+.lc-foot{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 18px;min-height:30px}
+[dir=rtl] .lc-foot{padding:12px 18px 12px 12px}
+.lc-msg{flex:1;margin:0;font-family:var(--lc-font);font-size:13px;opacity:.7;line-height:1.35}
+.lc-flipbtn{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:transparent;border:1.2px solid var(--lc-line);color:var(--lc-ink);cursor:pointer;padding:0;position:relative;opacity:.85}
+.lc-flipbtn::before{content:"";position:absolute;inset:-8px}
+.lc-x{margin-inline-start:auto}
+.lc-list{padding:4px 18px 18px;flex:1}
+.lc-brow{display:flex;flex-direction:column;gap:3px;padding:12px 0;border-top:1px solid color-mix(in srgb,var(--lc-ink) 12%,transparent)}.lc-brow span,.lc-brow a{font-size:15px;color:inherit;line-height:1.4}
+.lc-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:6px;vertical-align:1px}
+.lc-note{opacity:.7;font-size:13px!important}
 @media (prefers-reduced-motion:reduce){.lc-in-pop,.lc-in-ink,.lc-in-shine,.lc-shine::after{animation:none}.lc-flip{transition:none}}`;
   return{html,css,attach,palette,glyph,tierOf,badgesOf,hoursState};
 })();
