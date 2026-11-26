@@ -55,6 +55,8 @@ input:focus{outline:none;border-color:var(--red)}
 .go{flex:1;min-height:56px;border:0;border-radius:18px;background:var(--red);color:#fff;font:inherit;font-weight:700;font-size:18px;cursor:pointer}
 .go:disabled{opacity:.45;cursor:default}
 .pay{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:14px;margin-top:12px}
+.more{margin-top:16px}.more summary{list-style:none;cursor:pointer;min-height:54px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:18px;border:1.5px dashed var(--line);color:var(--muted);font-weight:700}
+.more summary::-webkit-details-marker{display:none}.more summary::before{content:"+";font-size:22px}.more[open] summary::before{content:"−"}.more summary small{font-weight:600}
 .err{color:var(--red);font-weight:700;text-align:center;min-height:24px;margin-top:10px}
 .msg{text-align:center;margin-top:60px}.msg b{display:block;font-size:22px;margin-bottom:6px}
 :focus-visible{outline:3px solid var(--saffron);outline-offset:3px}
@@ -67,7 +69,7 @@ input:focus{outline:none;border-color:var(--red)}
 
 <form id="f" hidden autocomplete="off">
  <h1>سجّل سيارتك</h1>
- <p class="lead">اكتب لوحتك، اختر الخدمة، وانتظر بسيارتك أو بالجوال. نرسل لك أول ما تخلص.</p>
+ <p class="lead">اكتب أرقام لوحتك واختر الخدمة بس. نرسل لك أول ما تخلص.</p>
 
  <div class="plate" id="plate" role="img" aria-label="لوحة سيارتك">
   <div class="c"><span id="pArDigits" class="ph">٠٠٠٠</span><span id="pDigits" class="ph">0000</span></div>
@@ -80,6 +82,13 @@ input:focus{outline:none;border-color:var(--red)}
   <input type="text" id="num" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="1234" aria-label="أرقام اللوحة">
  </section>
 
+ <section class="card" id="svcCard">
+  <h2>الخدمات</h2>
+  <div id="svcs"></div>
+  <div class="pay">💵 <span>الدفع عند السيارة لما تخلص</span></div>
+ </section>
+ <details class="more" id="more">
+  <summary>أضف حروف اللوحة واللون <small>اختياري</small></summary>
  <section class="card">
   <h2>حروف اللوحة <small id="lcount">٠ من ٣</small></h2>
   <div class="keys" id="keys"></div>
@@ -92,16 +101,11 @@ input:focus{outline:none;border-color:var(--red)}
   <input type="text" id="type" class="soft" maxlength="30" placeholder="نوع السيارة (مثلاً: كامري) — اختياري" aria-label="نوع السيارة" style="margin-top:6px">
  </section>
 
- <section class="card" id="svcCard">
-  <h2>الخدمات</h2>
-  <div id="svcs"></div>
-  <div class="pay">💵 <span>الدفع عند السيارة لما تخلص</span></div>
- </section>
-
  <section class="card">
   <h2>رقم جوالك <small>اختياري</small></h2>
   <input type="tel" id="phone" class="soft" inputmode="tel" maxlength="15" placeholder="05xxxxxxxx" aria-label="رقم جوالك" style="direction:ltr;text-align:center">
  </section>
+ </details>
  <div class="err" id="err" role="alert"></div>
 </form>
 
@@ -113,9 +117,9 @@ input:focus{outline:none;border-color:var(--red)}
 <script>
 {
 const isAr=(navigator.languages&&navigator.languages[0]||navigator.language||'ar').toLowerCase().startsWith('ar');
-const EN={'سجّل سيارتك — Tonsa':'Register your car — Tonsa','سجّل سيارتك':'Register your car','اكتب لوحتك، اختر الخدمة، وانتظر بسيارتك أو بالجوال. نرسل لك أول ما تخلص.':'Enter your plate, pick a service, and wait. We\'ll alert you as soon as it\'s done.',
+const EN={'سجّل سيارتك — Tonsa':'Register your car — Tonsa','سجّل سيارتك':'Register your car','اكتب أرقام لوحتك واختر الخدمة بس. نرسل لك أول ما تخلص.':'Just enter your plate numbers and pick a service. We\'ll alert you when it\'s done.',
 'أرقام اللوحة':'Plate numbers','١ إلى ٤ أرقام':'1 to 4 digits','حروف اللوحة':'Plate letters','لون السيارة':'Car colour','الخدمات':'Services','💵':'💵','الدفع عند السيارة لما تخلص':'Pay at the car when it\'s done',
-'رقم جوالك':'Your phone','اختياري':'optional','المجموع':'Total','سجّل سيارتي':'Register my car','لحظة…':'One moment…','الرابط ناقص':'Incomplete link','امسح الباركود اللي عند المغسلة مرة ثانية':'Scan the code at the car wash again',
+'رقم جوالك':'Your phone','أضف حروف اللوحة واللون':'Add plate letters and colour','اختياري':'optional','المجموع':'Total','سجّل سيارتي':'Register my car','لحظة…':'One moment…','الرابط ناقص':'Incomplete link','امسح الباركود اللي عند المغسلة مرة ثانية':'Scan the code at the car wash again',
 'ما لقينا المغسلة':'Car wash not found','المغسلة موقفة الطلبات الحين':'This car wash isn\'t taking orders right now','كلّم الموظف عند المغسلة':'Please talk to the staff',
 'اكتب أرقام اللوحة':'Enter the plate numbers','اختر خدمة وحدة على الأقل':'Pick at least one service','ما قدرنا نسجّل، جرّب مرة ثانية':'Couldn\'t register, please try again','نوع السيارة (مثلاً: كامري) — اختياري':'Car model (e.g. Camry) — optional',
 'لوحة سيارتك':'Your plate','أرقام اللوحة ':'Plate numbers'};
