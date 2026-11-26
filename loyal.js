@@ -5,15 +5,19 @@ const LoyalCard=(()=>{
   const hex=h=>{const v=parseInt(h.slice(1),16);return[(v>>16)&255,(v>>8)&255,v&255]};
   const mix=(a,b,t)=>{const x=hex(a),y=hex(b);return'#'+x.map((c,i)=>Math.round(c+(y[i]-c)*t).toString(16).padStart(2,'0')).join('')};
   const lum=h=>{const[r,g,b]=hex(h);return(0.299*r+0.587*g+0.114*b)/255};
-  function palette(bg){
+  // c: لون البطاقة، accent: لون الختم اللي اختاره المحل، inkC: لون الكلام
+  function palette(bg,accent,inkC){
     bg=/^#[0-9a-fA-F]{6}$/.test(bg||'')?bg:'#121715';
+    const ok=h=>/^#[0-9a-fA-F]{6}$/.test(h||'');
     const light=lum(bg)>0.6;
-    const m=light?'#1F1A17':'#F7F3EA', a=light?'#A97A30':'#D6B77B';
-    const ink=light?'#1A1715':'#FFFFFF';
-    // لو الذهبي ما يبان على لون البطاقة (أحمر، ذهبي) نكتب العناوين بلون الكلام
+    let m=light?'#1F1A17':'#F7F3EA', a=light?'#A97A30':'#D6B77B';
+    if(ok(accent)){ m=accent; a=lum(accent)>0.5?mix(accent,'#000000',0.32):mix(accent,'#FFFFFF',0.38); }
+    const ink=ok(inkC)?inkC:(light?'#1A1715':'#FFFFFF');
+    // لو العنوان ما يبان على لون البطاقة نكتبه بلون الكلام
     const lr=h=>{const c=hex(h).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]};
     const cr=(x,y)=>{const A=lr(x),B=lr(y);return(Math.max(A,B)+.05)/(Math.min(A,B)+.05)};
-    const label=cr(a,bg)>=3?a:mix(ink,bg,0.22);
+    const lab=ok(accent)?m:a;
+    const label=cr(lab,bg)>=3?lab:mix(ink,bg,0.22);
     return{bg,light,m,a,ink,label,dim:mix(bg,light?'#000000':'#FFFFFF',light?0.09:0.1)};
   }
   function glyph(icon,on,p,size){
@@ -29,14 +33,16 @@ const LoyalCard=(()=>{
   const esc=t=>String(t??'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
   // c: نتيجة get_card أو loyalty_join. o: {ar, wash, prev}
   function html(c,o){
-    const cfg=c.cfg, goal=cfg.goal, n=Math.min(c.stamps,goal), p=palette(cfg.color), ar=o.ar;
+    const cfg=c.cfg, goal=cfg.goal, n=Math.min(c.stamps,goal), p=palette(cfg.color,cfg.accent,cfg.ink), ar=o.ar;
     const D=x=>ar?String(x).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]):String(x);
+    const store='https://mqwtgwqyohrrvfjqwtgm.supabase.co/storage/v1/object/public/loyalty/';
+    const stampImg=(cfg.stamp_img||'').startsWith(store)?cfg.stamp_img:'', bgImg=(cfg.bg_img||'').startsWith(store)?cfg.bg_img:'';
     const rows=goal<=6?1:goal<=14?2:3, per=Math.ceil(goal/rows);
     const size=Math.min(52,Math.floor(300/per)-6);
     let grid='';
     for(let r=0,i=0;r<rows;r++){
       grid+='<div class="lc-row">';
-      for(let k=0;k<per&&i<goal;k++,i++) grid+=`<span class="lc-st${i<n&&o.prev!=null&&i>=o.prev?' lc-pop':''}">${glyph(cfg.icon,i<n,p,size)}</span>`;
+      for(let k=0;k<per&&i<goal;k++,i++) grid+=`<span class="lc-st${i<n&&o.prev!=null&&i>=o.prev?' lc-pop':''}">${stampImg?`<img src="${esc(stampImg)}" alt="" width="${size}" height="${size}" class="lc-img${i<n?'':' lc-off'}">`:glyph(cfg.icon,i<n,p,size)}</span>`;
       grid+='</div>';
     }
     const shop=c.shop||{}, reward=ar?cfg.reward_ar:cfg.reward_en, left=goal-n, wash=o.wash??!!shop.wash;
@@ -46,7 +52,7 @@ const LoyalCard=(()=>{
     const leftTxt=c.rewards>0?(ar?'مكافأتك جاهزة 🎁':'Reward ready 🎁'):(ar?arCount:`${left} ${wash?(left===1?'wash':'washes'):(left===1?'order':'orders')}`);
     let qr='';
     if(o.qr&&c.member&&window.qrcode){const q=qrcode(0,'M');q.addData('TONSA:'+c.member);q.make();qr=`<div class="lc-qr">${q.createSvgTag({cellSize:4,margin:0,scalable:true})}<b>${esc(c.member)}</b></div>`;}
-    return `<div class="lc" style="--lc-bg:${p.bg};--lc-ink:${p.ink};--lc-label:${p.label}">
+    return `<div class="lc" style="--lc-bg:${p.bg};--lc-ink:${p.ink};--lc-label:${p.label}${bgImg?`;background-image:linear-gradient(${p.bg}73,${p.bg}73),url('${esc(bgImg)}');background-size:cover;background-position:center`:''}">
       <div class="lc-top">${logo}<b class="lc-name">${esc(shop.name||'')}</b><div class="lc-f lc-end"><small>${ar?'الأختام':'Stamps'}</small><span>${ar?`${D(n)} من ${D(goal)}`:`${n} of ${goal}`}</span></div></div>
       <div class="lc-grid" role="img" aria-label="${ar?`${n} أختام من ${goal}`:`${n} of ${goal} stamps`}">${grid}</div>
       <div class="lc-fields"><div class="lc-f"><small>${ar?'المكافأة':'Reward'}</small><span>${esc(reward)}</span></div><div class="lc-f lc-end"><small>${c.rewards>0?(ar?'عندك':'You have'):(ar?'باقي':'Left')}</small><span>${leftTxt}</span></div></div>
@@ -59,7 +65,7 @@ const LoyalCard=(()=>{
 .lc-name{font-size:19px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lc-f{display:flex;flex-direction:column;line-height:1.25}.lc-f small{color:var(--lc-label);font-size:12px;font-weight:600}.lc-f span{font-size:19px;font-variant-numeric:tabular-nums}
 .lc-end{text-align:end}.lc-grid{margin:18px 0 20px;display:flex;flex-direction:column;gap:8px}
-.lc-row{display:flex;justify-content:center;gap:8px}.lc-st{display:grid;place-items:center}.lc-st svg{display:block}
+.lc-row{display:flex;justify-content:center;gap:8px}.lc-st{display:grid;place-items:center}.lc-st svg{display:block}.lc-img{object-fit:contain;display:block}.lc-off{filter:grayscale(1);opacity:.22}
 .lc-pop{animation:lcpop .6s cubic-bezier(.3,1.6,.5,1) both}@keyframes lcpop{0%{transform:scale(.2) rotate(-20deg);opacity:0}100%{transform:none;opacity:1}}
 .lc-fields{display:flex;justify-content:space-between;gap:12px;margin-top:4px}
 .lc-qr{margin:22px auto 0;background:#fff;border-radius:12px;padding:12px 12px 6px;width:52%;text-align:center;color:#111}
