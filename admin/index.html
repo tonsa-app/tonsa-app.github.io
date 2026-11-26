@@ -61,7 +61,8 @@ details summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;alig
     <h2>كوفي جديد</h2>
     <div class="card">
       <div class="grid one">
-        <input id="newName" placeholder="اسم الكوفي">
+        <select id="newKind"><option value="cafe">☕ كوفي / مطعم</option><option value="carwash">🚗 مغسلة سيارات</option></select>
+        <input id="newName" placeholder="اسم المحل">
         <input id="newPhone" placeholder="جوال صاحب الكوفي (اختياري)" inputmode="tel" dir="ltr" style="text-align:right">
       </div>
       <p class="meta">ياخذ تجربة مجانية ١٤ يوم بكل مميزات الاحترافية.</p>
@@ -129,7 +130,7 @@ function render(data) {
     const [k, name, detail] = planOf(c);
     const siblings = c.owner_group ? groups[c.owner_group].filter((n) => n !== c.name) : [];
     return `<div class="card" id="c-${c.id}">
-      <div class="row"><div><b style="font-size:19px">${esc(c.name)}</b><div class="meta">${c.orders_30d} طلب آخر ٣٠ يوم</div></div>
+      <div class="row"><div><b style="font-size:19px">${c.business_type === 'carwash' ? '🚗 ' : ''}${esc(c.name)}</b><div class="meta">${c.orders_30d} طلب آخر ٣٠ يوم</div></div>
         <span class="pill ${k}" style="flex:0 0 auto">${name}</span></div>
       <p class="meta" style="margin:6px 0 10px">${detail}</p>
       <div class="grid"><div><div class="meta">رمز المحل</div><div class="big">${esc(c.code)}</div></div>
@@ -171,7 +172,7 @@ $('create').onclick = async () => {
   const name = $('newName').value.trim(); if (!name) return $('newName').focus();
   $('create').disabled = true;
   try {
-    const { cafe } = await call('create', { name, phone: $('newPhone').value });
+    const { cafe } = await call('create', { name, phone: $('newPhone').value, kind: $('newKind').value });
     const text = welcome(cafe), phone = $('newPhone').value;
     $('created').innerHTML = `<div class="grid"><div><div class="meta">رمز المحل</div><div class="big">${esc(cafe.code)}</div></div>
       <div><div class="meta">الرقم السري</div><div class="big">${esc(cafe.staff_pin)}</div></div></div>
