@@ -286,8 +286,8 @@ footer a:hover{color:var(--ink)}
 footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
 
 /* ظهور الأقسام */
-.rise{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
-.rise.in{opacity:1;transform:none}
+.js .rise{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.js .rise.in{opacity:1;transform:none}
 
 @media (max-width:980px){
   .old,.loyal,.washsec{grid-template-columns:1fr;gap:32px}
@@ -300,16 +300,17 @@ footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
 @media (max-width:560px){.staff{grid-template-columns:1fr}.vs li{grid-template-columns:1fr}.vs .head{display:none}}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
-  .rise{opacity:1;transform:none}
+  .js .rise{opacity:1;transform:none}
   html{scroll-behavior:auto}
 }
 </style>
 </head>
 <body>
+<script>document.documentElement.classList.add("js")</script>
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="./"><img src="icon.png" alt="">Tonsa</a>
+    <a class="brand" href="./"><img src="https://tonsa-app.github.io/icon.png" alt="">Tonsa</a>
     <nav aria-label="الأقسام">
       <a href="#pager">البيجر</a>
       <a href="#loyalty">بطاقة الولاء</a>
@@ -609,7 +610,7 @@ footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
 
 <footer>
   <div class="wrap">
-    <a class="brand" href="./"><img src="icon.png" alt="">Tonsa</a>
+    <a class="brand" href="./"><img src="https://tonsa-app.github.io/icon.png" alt="">Tonsa</a>
     <a href="pricing.html">الباقات</a>
     <a href="support.html">الدعم</a>
     <a href="privacy.html">الخصوصية</a>
@@ -617,12 +618,18 @@ footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
   </div>
 </footer>
 
-<script src="loyal.js"></script>
+<script src="https://tonsa-app.github.io/loyal.js"></script>
 <script>
 (()=>{
   const $=id=>document.getElementById(id);
   const AR=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ===== ظهور الأقسام =====
+  if(!reduce && 'IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+    document.querySelectorAll('.rise').forEach(el=>io.observe(el));
+  }else document.querySelectorAll('.rise').forEach(el=>el.classList.add('in'));
 
   // ===== تاريخ الجوال في العرض =====
   try{$('pDate').textContent=new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-arab',{weekday:'long',day:'numeric',month:'long'}).format(new Date())}catch(e){}
@@ -674,6 +681,7 @@ footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
   setNo();
 
   // ===== بطاقة الولاء الحية =====
+  if(window.LoyalCard){
   const st=document.createElement('style'); st.textContent=LoyalCard.css; document.head.appendChild(st);
   const card={stamps:2,rewards:0,redeemed:3,visits:9,name:'',member:'',
     shop:{name:'كوفي الحارة'},
@@ -694,12 +702,8 @@ footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
     else{$('cardNote').textContent=goal-card.stamps===1?'باقي ختم واحد! هنا يوصله تنبيه «قرّبت».':`باقي ${AR(goal-card.stamps)} وتاخذ المكافأة`;$('stamp').lastChild.textContent='اختم ختم'}
     draw();
   };
+  }
 
-  // ===== ظهور الأقسام =====
-  if(!reduce && 'IntersectionObserver' in window){
-    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
-    document.querySelectorAll('.rise').forEach(el=>io.observe(el));
-  }else document.querySelectorAll('.rise').forEach(el=>el.classList.add('in'));
 })();
 </script>
 </body>
