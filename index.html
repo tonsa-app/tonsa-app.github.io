@@ -1,13 +1,706 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#E5303C">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#E5303C">
+<title>Tonsa — اطلب وتنسى. بيجر على جوال عميلك</title>
+<meta name="description" content="Tonsa يحوّل جوال عميلك لبيجر: يمسح الكود عند الكاشير، ويرن جواله أول ما يجهز طلبه حتى لو مقفل. بدون تطبيق وبدون أجهزة. للكوفيهات والمطاعم والمغاسل، ومعه بطاقة ولاء بالأختام.">
+<meta property="og:title" content="Tonsa — اطلب وتنسى">
+<meta property="og:description" content="جوال عميلك هو البيجر. يرن أول ما يجهز طلبه، بدون تطبيق.">
+<meta property="og:image" content="https://tonsa-app.github.io/icon.png">
 <link rel="icon" href="favicon.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"><title>Tonsa — نناديك أول ما يجهز طلبك</title><meta name="description" content="Tonsa: امسح الكود عند الكاشير واقفل جوالك، ونناديك أول ما يجهز طلبك. بدون تحميل تطبيق وبدون أجهزة بيجر."></head><body>
-<header class="top wrap"><a class="brand" href="./"><img src="icon.png" alt="">Tonsa</a>
-<nav><a href="./" aria-current=page>الرئيسية</a><a href="pricing.html">الباقات</a><a href="support.html" >الدعم</a><a href="privacy.html" >الخصوصية</a></nav></header>
-<main class="wrap">
-<section class="hero"><h1>كل طلب تذكرة،<br>ونناديك أول ما يجهز</h1><p>امسح كود Tonsa عند الكاشير بكاميرا جوالك، واقفل جوالك وارتاح. يوصلك تنبيه "طلبك جاهز" حتى لو الجوال مقفل، بدون تحميل أي تطبيق.</p></section>
-<div class="steps"><div class="step"><b>١</b><span>امسح الكود</span></div><div class="step"><b>٢</b><span>اقفل جوالك</span></div><div class="step"><b>٣</b><span>نناديك</span></div></div>
-<div class="ticket"><div class="stub"><div><small>رقم</small><strong>25</strong></div></div><div class="body"><h2>طلبك جاهز 🔔</h2><p style="margin:0;color:var(--muted)">هذا شكل التذكرة اللي تطلع لك. ولما يجهز طلبك تتحول للون الزعفران ويوصلك تنبيه.</p></div></div>
-<section class="card"><h2>لأصحاب الكوفيهات والمطاعم</h2><ul><li>بدون أجهزة بيجر ولا تكاليف صيانة.</li><li>الكاشير يكتب رقم الطلب، ويطلع كود للعميل على الشاشة أو التابلت.</li><li>ضغطة "جاهز" ترسل التنبيه للعميل فورًا، و"نداء أخير" لو تأخر.</li></ul><p>تبي Tonsa في محلك؟ كلمنا:</p><div class="contact"><a class="btn wa" href="https://wa.me/966505484034"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.8-.1 1.4z"/></svg> واتساب 0505484034</a><a class="btn mail" href="mailto:waled26252@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg> waled26252@gmail.com</a></div></section>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E5303C;--red-deep:#B81F3A;--coral:#FF6B45;--saffron:#F5B82E;
+  --ink:#1B1418;--muted:#6B6268;--paper:#FFFFFF;--ground:#FBF6F4;--line:#EADFDB;--soft:#F4ECE8;
+  --display:"Reem Kufi","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --r:28px;
+  --num:"IBM Plex Sans Arabic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{--ink:#F6EFEC;--muted:#B5AAAE;--paper:#211A1D;--ground:#140F11;--line:#3A2F33;--soft:#2A2125}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--ground);color:var(--ink);font:17px/1.7 "IBM Plex Sans Arabic",system-ui,-apple-system,sans-serif;overflow-x:hidden}
+a{color:inherit}
+img,svg{display:block}
+.wrap{width:min(1120px,100% - 40px);margin-inline:auto}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:3px;border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ===== الرأس ===== */
+.top{position:sticky;top:0;z-index:20;backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);background:color-mix(in srgb,var(--ground) 82%,transparent);border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.top .wrap{display:flex;align-items:center;gap:20px;height:68px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 22px/1 var(--display);letter-spacing:.01em}
+.brand img{width:36px;height:36px;border-radius:10px}
+.top nav{display:flex;gap:4px;margin-inline-start:12px}
+.top nav a{text-decoration:none;color:var(--muted);font-weight:600;font-size:15px;padding:10px 12px;border-radius:999px}
+.top nav a:hover{color:var(--ink);background:var(--soft)}
+.top .cta{margin-inline-start:auto}
+@media (max-width:820px){.top nav{display:none}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border-radius:999px;font:700 16px/1 inherit;font-family:inherit;text-decoration:none;border:0;cursor:pointer;transition:transform .15s ease,background .2s}
+.btn:active{transform:scale(.97)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#d22633}
+.btn-ink{background:var(--ink);color:var(--ground)}
+.btn-ghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5)}
+.btn-ghost:hover{background:rgba(255,255,255,.24)}
+.btn-line{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn-line:hover{background:var(--soft)}
+.btn svg{width:20px;height:20px}
+
+/* ===== البطل: تذكرة حمراء كبيرة ===== */
+.hero{padding:28px 0 12px}
+.ticket-hero{position:relative;color:#fff;border-radius:40px;background:
+  radial-gradient(900px 500px at 85% -10%,rgba(255,170,120,.55),transparent 60%),
+  linear-gradient(160deg,var(--coral),var(--red) 45%,var(--red-deep));
+  overflow:hidden;isolation:isolate}
+/* قصّات التذكرة على الجنبين */
+.ticket-hero::before,.ticket-hero::after{content:"";position:absolute;top:calc(100% - 132px);width:44px;height:44px;border-radius:50%;background:var(--ground);z-index:2}
+.ticket-hero::before{left:-22px}.ticket-hero::after{right:-22px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:center;padding:56px 56px 40px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;background:rgba(0,0,0,.16);padding:6px 14px 6px 12px;border-radius:999px}
+.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--saffron);box-shadow:0 0 0 4px rgba(245,184,46,.3)}
+.hero h1{font:700 clamp(54px,9vw,112px)/1.02 var(--display);margin:18px 0 18px;letter-spacing:-.01em}
+.hero h1 .fade{display:inline-block;color:#FFD98A;position:relative}
+.hero h1 .fade{animation:drift 1.2s .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes drift{from{opacity:0;transform:translateY(.25em);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+.hero p.lead{font-size:clamp(17px,2vw,20px);line-height:1.75;max-width:30em;margin:0 0 26px;color:rgba(255,255,255,.92)}
+.hero .actions{display:flex;flex-wrap:wrap;gap:12px}
+.hero .btn-white{background:#fff;color:var(--red)}
+.perks{display:flex;flex-wrap:wrap;gap:8px 22px;margin:26px 0 0;padding:0;list-style:none;font-size:15px;font-weight:600;color:rgba(255,255,255,.9)}
+.perks li{display:flex;align-items:center;gap:8px}
+.perks svg{width:18px;height:18px;flex:none}
+
+/* الشريط المثقّب تحت التذكرة */
+.stub{position:relative;border-top:2px dashed rgba(255,255,255,.35);padding:22px 56px 26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-weight:600}
+.stub .num{font:700 44px/1 var(--num);font-variant-numeric:tabular-nums;background:rgba(0,0,0,.16);border-radius:16px;padding:12px 18px 8px;min-width:96px;text-align:center}
+.stub small{display:block;font-size:13px;opacity:.75;font-weight:600}
+.stub .say{flex:1;min-width:220px;font-size:17px}
+
+/* ===== العرض الحي: الكاشير والجوال ===== */
+.demo{position:relative;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:22px;justify-items:center}
+.pad{background:rgba(20,6,10,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.22);border-radius:26px;padding:18px;width:200px;display:flex;flex-direction:column;gap:10px;align-self:center;z-index:1}
+.pad h3{margin:0;font-size:13px;font-weight:700;opacity:.8}
+.pad .order{display:flex;align-items:baseline;justify-content:space-between;background:rgba(255,255,255,.12);border-radius:16px;padding:10px 14px}
+.pad .order b{font:700 38px/1 var(--num);font-variant-numeric:tabular-nums}
+.pad .order span{font-size:13px;font-weight:700;opacity:.85}
+.pad button{min-height:52px;border-radius:16px;border:0;font:700 18px/1 inherit;font-family:inherit;cursor:pointer;transition:transform .15s,opacity .2s,background .2s}
+.pad button:active{transform:scale(.96)}
+.pad .go{background:#fff;color:var(--red);box-shadow:0 10px 24px -10px rgba(0,0,0,.5)}
+.pad .go.pulse{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.55),0 10px 24px -10px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 10px rgba(255,255,255,0),0 10px 24px -10px rgba(0,0,0,.5)}}
+.pad .last{background:rgba(0,0,0,.22);color:#fff}
+.pad .reset{background:transparent;color:#fff;min-height:40px;font-size:14px;opacity:.85;text-decoration:underline;text-underline-offset:4px}
+.pad button:disabled{opacity:.4;cursor:default}
+.pad .hint{font-size:12.5px;line-height:1.5;opacity:.85;margin:0}
+
+.phone{position:relative;width:268px;aspect-ratio:9/19.3;border-radius:46px;background:#0b0b0c;padding:10px;box-shadow:0 40px 80px -30px rgba(60,0,10,.7),0 0 0 2px rgba(255,255,255,.12) inset;transform:rotate(-3deg);transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
+.phone.ring{animation:buzz .5s linear 3}
+@keyframes buzz{0%,100%{transform:rotate(-3deg) translateX(0)}20%{transform:rotate(-4.5deg) translateX(-5px)}40%{transform:rotate(-1.5deg) translateX(5px)}60%{transform:rotate(-4deg) translateX(-4px)}80%{transform:rotate(-2deg) translateX(4px)}}
+.screen{position:relative;height:100%;border-radius:37px;overflow:hidden;color:#fff;
+  background:radial-gradient(120% 70% at 50% 0%,#3a2a6a,transparent 70%),linear-gradient(180deg,#1d1838,#0e0d18);transition:background .6s}
+.phone.ready .screen{background:radial-gradient(120% 70% at 50% 0%,#ffcf5a,transparent 70%),linear-gradient(180deg,#b9721a,#2a1606)}
+.island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:92px;height:28px;border-radius:20px;background:#000;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:0 10px;overflow:hidden;transition:width .55s cubic-bezier(.3,1.3,.5,1),height .55s cubic-bezier(.3,1.3,.5,1),border-radius .5s}
+.island .il{opacity:0;transition:opacity .3s;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;white-space:nowrap}
+.island .il b{color:var(--saffron);font-family:var(--num);font-size:14px}
+.phone.ready .island{width:212px;height:40px;border-radius:22px}
+.phone.ready .island .il{opacity:1;transition-delay:.25s}
+.clock{text-align:center;margin-top:58px;line-height:1}
+.clock small{display:block;font-size:12px;font-weight:600;opacity:.85;margin-bottom:4px}
+.clock b{font:700 64px/1 "IBM Plex Sans Arabic",system-ui;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+/* النشاط المباشر على شاشة القفل */
+.live{position:absolute;inset-inline:10px;bottom:72px;background:rgba(255,255,255,.14);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:22px;padding:12px 14px 14px;font-size:12px;transition:background .5s}
+.phone.ready .live{background:rgba(255,236,190,.92);color:#2a1606}
+.live .row{display:flex;align-items:center;gap:8px}
+.live .logo{width:26px;height:26px;border-radius:8px;background:var(--red);display:grid;place-items:center;flex:none}
+.live .logo svg{width:16px;height:16px}
+.live .t{flex:1;line-height:1.3}
+.live .t b{display:block;font-size:13px}
+.live .no{font:700 24px/1 var(--num);font-variant-numeric:tabular-nums}
+.live .bar{height:6px;border-radius:9px;background:rgba(255,255,255,.22);margin-top:10px;overflow:hidden}
+.phone.ready .live .bar{background:rgba(42,22,6,.15)}
+.live .bar i{display:block;height:100%;width:30%;border-radius:9px;background:var(--saffron);transition:width .8s cubic-bezier(.3,1,.4,1)}
+.phone.ready .live .bar i{background:var(--red)}
+.live .steps{display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;font-weight:700;opacity:.8}
+.live .steps span.on{opacity:1;color:var(--saffron)}
+.phone.ready .live .steps span.on{color:var(--red)}
+/* بانر التنبيه */
+.banner{position:absolute;inset-inline:10px;top:150px;background:rgba(250,248,252,.96);color:#141014;border-radius:20px;padding:10px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 14px 30px -12px rgba(0,0,0,.6);transform:translateY(-24px) scale(.96);opacity:0;transition:transform .5s cubic-bezier(.3,1.4,.5,1),opacity .3s;z-index:2}
+.phone.ready .banner{transform:none;opacity:1}
+.banner .logo{width:34px;height:34px;border-radius:9px;background:var(--red);display:grid;place-items:center;flex:none}
+.banner .logo svg{width:20px;height:20px}
+.banner b{display:block;font-size:13px}.banner span{font-size:12px;color:#5d555b}
+.banner time{margin-inline-start:auto;align-self:flex-start;font-size:10.5px;color:#8a8289}
+.phone.final .banner{background:#fff3f1}
+.phone.final .banner b{color:var(--red)}
+.home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:96px;height:4px;border-radius:9px;background:rgba(255,255,255,.7)}
+.phone.ready .home{background:rgba(42,22,6,.5)}
+.ripple{position:absolute;inset:0;border-radius:46px;pointer-events:none}
+.phone.ring .ripple{animation:ripple 1.4s ease-out}
+@keyframes ripple{0%{box-shadow:0 0 0 0 rgba(255,214,120,.8)}100%{box-shadow:0 0 0 60px rgba(255,214,120,0)}}
+
+@media (max-width:980px){
+  .hero-grid{grid-template-columns:1fr;padding:40px 26px 30px}
+  .stub{padding:20px 26px 24px}
+  .ticket-hero::before,.ticket-hero::after{top:calc(100% - 140px)}
+}
+@media (max-width:560px){
+  .demo{grid-template-columns:1fr;gap:18px}
+  .pad{width:100%;max-width:330px;order:2}
+  .phone{width:240px}
+  .ticket-hero{border-radius:30px}
+}
+
+/* ===== الأقسام ===== */
+section{padding:84px 0 0}
+.kicker{font-weight:700;font-size:14px;color:var(--red);letter-spacing:.02em;margin:0 0 10px}
+h2{font:700 clamp(34px,5vw,56px)/1.1 var(--display);margin:0 0 16px;letter-spacing:-.005em}
+.sub{font-size:18px;color:var(--muted);max-width:36em;margin:0}
+
+/* البيجر القديم */
+.old{display:grid;grid-template-columns:1fr 1.15fr;gap:40px;align-items:center}
+.graveyard{position:relative;background:var(--paper);border-radius:var(--r);padding:30px;border:1px solid var(--line);min-height:300px;overflow:hidden}
+.graveyard .pg{position:absolute;width:86px;height:86px;border-radius:24px;background:#2b2b30;box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),0 10px 20px -10px rgba(0,0,0,.5);display:grid;place-items:center}
+.graveyard .pg::before{content:"";width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,#555 30%,#3a3a40 32%,#3a3a40 60%,#2b2b30 62%)}
+.graveyard .pg i{position:absolute;top:10px;width:24px;height:4px;border-radius:9px;background:#444}
+.graveyard .tag{position:absolute;font-size:13px;font-weight:700;background:var(--ground);border:1px solid var(--line);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.graveyard .x{color:var(--red)}
+.vs{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:12px}
+.vs li{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vs span{border-radius:16px;padding:12px 16px;font-weight:600;font-size:15.5px;line-height:1.45}
+.vs .was{background:var(--soft);color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--red) 55%,transparent);text-decoration-thickness:2px}
+.vs .now{background:color-mix(in srgb,var(--saffron) 22%,var(--paper));color:var(--ink)}
+.vs .head span{background:none;padding:0 4px;font-size:13px;text-decoration:none;color:var(--muted);font-weight:700}
+
+/* المنتجات: ثلاث تذاكر */
+.tickets{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
+.tk{position:relative;border-radius:var(--r);padding:26px 26px 0;display:flex;flex-direction:column;min-height:420px;overflow:hidden;text-decoration:none;color:var(--ink);background:var(--paper);border:1px solid var(--line);transition:transform .3s cubic-bezier(.3,1.4,.5,1),box-shadow .3s}
+.tk:hover{transform:translateY(-6px) rotate(-.6deg);box-shadow:0 30px 50px -30px rgba(80,10,20,.35)}
+.tk::before,.tk::after{content:"";position:absolute;bottom:86px;width:26px;height:26px;border-radius:50%;background:var(--ground);border:1px solid var(--line)}
+.tk::before{left:-14px}.tk::after{right:-14px}
+.tk .ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;margin-bottom:16px}
+.tk .ic svg{width:28px;height:28px}
+.tk h3{font:700 28px/1.2 var(--display);margin:0 0 8px}
+.tk p{margin:0;color:var(--muted);font-size:16px}
+.tk ul{margin:14px 0 0;padding:0;list-style:none;font-size:15px;font-weight:600;display:grid;gap:6px}
+.tk ul li{display:flex;gap:8px;align-items:flex-start}
+.tk ul svg{width:18px;height:18px;flex:none;margin-top:4px;color:var(--red)}
+.tk .foot{margin:auto -26px 0;border-top:2px dashed var(--line);padding:18px 26px 20px;display:flex;align-items:baseline;justify-content:space-between}
+.tk .foot b{font:700 30px/1 var(--num);font-variant-numeric:tabular-nums}
+.tk .foot small{color:var(--muted);font-weight:600;font-size:13px}
+.tk .foot .go{font-weight:700;font-size:14px;color:var(--red)}
+.tk.pager .ic{background:color-mix(in srgb,var(--red) 14%,var(--paper));color:var(--red)}
+.tk.wash .ic{background:color-mix(in srgb,#2F6FE4 14%,var(--paper));color:#2F6FE4}
+.tk.loy .ic{background:color-mix(in srgb,var(--saffron) 26%,var(--paper));color:#A06A00}
+.tk .badge{position:absolute;top:22px;inset-inline-end:22px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--soft);color:var(--muted)}
+
+/* كيف يشتغل */
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px;counter-reset:s}
+.step{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+.step .n{font:700 64px/1 var(--num);color:var(--red);opacity:.9;font-variant-numeric:tabular-nums}
+.step h3{font-size:21px;margin:10px 0 6px}
+.step p{margin:0;color:var(--muted);font-size:16px}
+.step:not(:last-child)::after{content:"";position:absolute;top:50%;inset-inline-end:-18px;width:18px;border-top:2px dashed var(--line)}
+
+/* الولاء: بطاقة حية */
+.loyal{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.loyal-stage{position:relative;border-radius:36px;padding:40px 24px;display:grid;place-items:center;gap:18px;background:
+  radial-gradient(500px 300px at 50% 0%,rgba(234,211,179,.35),transparent 70%),linear-gradient(180deg,#2a1a10,#160d07);overflow:hidden}
+.loyal-stage .lc-wrap{max-width:330px}
+.stampbtn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 24px;border-radius:999px;border:0;background:#EAD3B3;color:#2E1B10;font:700 17px/1 inherit;font-family:inherit;cursor:pointer;box-shadow:0 12px 24px -12px rgba(0,0,0,.7);transition:transform .15s}
+.stampbtn:active{transform:scale(.95)}
+.stampbtn svg{width:22px;height:22px}
+.loyal-stage .note{color:#EAD3B3;font-size:14px;font-weight:600;min-height:1.6em;margin:0;text-align:center}
+.checks{list-style:none;padding:0;margin:24px 0 0;display:grid;gap:14px}
+.checks li{display:flex;gap:12px;align-items:flex-start;font-size:16.5px}
+.checks svg{width:24px;height:24px;flex:none;color:var(--red);margin-top:2px}
+.checks b{display:block}
+.checks span{color:var(--muted);font-size:15.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chips span{font-size:13.5px;font-weight:700;border-radius:999px;padding:6px 12px;border:1px solid var(--line);background:var(--paper)}
+.chips span i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:6px;vertical-align:-1px}
+
+/* المغسلة: لوحة سعودية */
+.washsec{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.carcard{background:var(--paper);border:1px solid var(--line);border-radius:36px;padding:30px;display:grid;gap:18px}
+.plate{direction:ltr;display:grid;grid-template-columns:1fr 1fr 44px;width:min(360px,100%);margin-inline:auto;border:3px solid #111;border-radius:12px;background:#fff;color:#111;overflow:hidden;font-weight:700;box-shadow:0 16px 30px -18px rgba(0,0,0,.6)}
+.plate div{display:grid;grid-template-rows:1fr 1fr;text-align:center}
+.plate div span{display:grid;place-items:center;font-size:30px;line-height:1;padding:8px 4px;font-variant-numeric:tabular-nums}
+.plate div span+span{border-top:2px solid #111}
+.plate div+div{border-left:2px solid #111}
+.plate .ksa{background:#fff;border-left:2px solid #111;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 0;font-size:10px;font-family:system-ui;letter-spacing:.05em}
+.plate .ksa i{width:22px;height:22px;border-radius:50%;background:#0B7A43}
+.wash-line{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:16px;background:var(--soft);font-weight:600}
+.wash-line b{font-variant-numeric:tabular-nums}
+.wash-total{display:flex;justify-content:space-between;align-items:center;padding:4px 6px 0;font-weight:700;font-size:19px}
+.wash-ready{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;border-radius:18px;background:#2F6FE4;color:#fff;font-weight:700;font-size:17px}
+
+/* للموظفين */
+.staff{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+.feat{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:22px}
+.feat svg{width:28px;height:28px;color:var(--red)}
+.feat h3{font-size:18px;margin:12px 0 4px}
+.feat p{margin:0;color:var(--muted);font-size:15px;line-height:1.6}
+
+/* الأسعار */
+.prices{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
+.price{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:26px;display:flex;flex-direction:column;gap:16px}
+.price h3{margin:0;font:700 24px/1.2 var(--display);display:flex;align-items:center;gap:10px}
+.price h3 svg{width:26px;height:26px}
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tier{border-radius:18px;padding:14px;background:var(--soft)}
+.tier.pro{background:color-mix(in srgb,var(--saffron) 22%,var(--paper));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--saffron) 70%,transparent)}
+.tier small{display:block;font-weight:700;font-size:13px;color:var(--muted)}
+.tier b{font:700 36px/1.1 var(--num);font-variant-numeric:tabular-nums}
+.tier i{font-style:normal;font-size:12.5px;color:var(--muted);font-weight:600;display:block}
+.price p{margin:0;color:var(--muted);font-size:15px}
+.deals{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.deals span{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:8px 16px}
+.deals svg{width:18px;height:18px;color:var(--red)}
+
+/* الأسئلة */
+.faq{max-width:820px;margin-top:30px;display:grid;gap:10px}
+.faq details{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:0 22px}
+.faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:64px;font-weight:700;font-size:17px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";width:12px;height:12px;border-inline-end:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg);transition:transform .25s;flex:none;margin-top:-6px}
+.faq details[open] summary::after{transform:rotate(225deg);margin-top:6px}
+.faq details p{margin:0 0 20px;color:var(--muted)}
+
+/* النهاية */
+.final{margin:96px 0 0;position:relative;border-radius:40px;background:var(--ink);color:var(--ground);padding:60px 40px;display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center;overflow:hidden}
+.final .big{font:700 clamp(120px,18vw,220px)/.8 var(--num);color:var(--saffron);font-variant-numeric:tabular-nums}
+.final h2{color:var(--ground)}
+.final p{margin:0 0 24px;color:color-mix(in srgb,var(--ground) 70%,transparent);font-size:18px}
+.final .actions{display:flex;flex-wrap:wrap;gap:12px}
+.final .btn-line{color:var(--ground);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ground) 35%,transparent)}
+.final .btn-line:hover{background:rgba(255,255,255,.08)}
+
+footer{padding:48px 0 40px;color:var(--muted);font-size:15px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;border-top:1px solid var(--line);padding-top:28px}
+footer a{text-decoration:none;font-weight:600}
+footer a:hover{color:var(--ink)}
+footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
+
+/* ظهور الأقسام */
+.rise{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.rise.in{opacity:1;transform:none}
+
+@media (max-width:980px){
+  .old,.loyal,.washsec{grid-template-columns:1fr;gap:32px}
+  .tickets,.how,.prices{grid-template-columns:1fr}
+  .staff{grid-template-columns:1fr 1fr}
+  .step:not(:last-child)::after{display:none}
+  .final{grid-template-columns:1fr;padding:44px 26px;gap:10px}
+  .tk{min-height:0}
+}
+@media (max-width:560px){.staff{grid-template-columns:1fr}.vs li{grid-template-columns:1fr}.vs .head{display:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rise{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="icon.png" alt="">Tonsa</a>
+    <nav aria-label="الأقسام">
+      <a href="#pager">البيجر</a>
+      <a href="#loyalty">بطاقة الولاء</a>
+      <a href="#wash">المغاسل</a>
+      <a href="#prices">الأسعار</a>
+      <a href="#faq">أسئلة</a>
+    </nav>
+    <a class="btn btn-red cta" href="https://wa.me/966505484034?text=%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%AC%D8%B1%D8%A8%20Tonsa%20%D9%85%D8%AC%D8%A7%D9%86%D9%8B%D8%A7">جرّبه مجانًا</a>
+  </div>
+</header>
+
+<main>
+<!-- ===== البطل ===== -->
+<div class="hero wrap" id="pager">
+  <div class="ticket-hero">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow"><i></i>بيجر على جوال عميلك</span>
+        <h1>اطلب…<br><span class="fade">وتنسى.</span></h1>
+        <p class="lead">عميلك يمسح الكود عند الكاشير، يقفل جواله ويجلس مرتاح. أول ما يجهز طلبه يرن جواله، حتى لو مقفل، بدون ما يحمّل أي تطبيق.</p>
+        <div class="actions">
+          <a class="btn btn-white" href="https://wa.me/966505484034?text=%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%AC%D8%B1%D8%A8%20Tonsa%20%D9%85%D8%AC%D8%A7%D9%86%D9%8B%D8%A7">جرّبه ١٤ يوم مجانًا</a>
+          <a class="btn btn-ghost" href="#prices">شوف الأسعار</a>
+        </div>
+        <ul class="perks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>بدون أجهزة بيجر</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>العميل ما يحمّل تطبيق</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>آيفون وأندرويد</li>
+        </ul>
+      </div>
+
+      <!-- العرض الحي -->
+      <div class="demo" aria-label="جرّب النداء">
+        <div class="pad">
+          <h3>شاشة الكاشير</h3>
+          <div class="order"><b id="ordNo">٢٥</b><span id="ordState">نحضّره</span></div>
+          <button class="go pulse" id="btnReady" type="button">جاهز</button>
+          <button class="last" id="btnLast" type="button" disabled>نداء أخير</button>
+          <button class="reset" id="btnReset" type="button" hidden>طلب جديد</button>
+          <p class="hint" id="hint">أنت الكاشير الحين. اضغط «جاهز» وشوف جوال العميل.</p>
+        </div>
+        <div class="phone" id="phone" aria-hidden="true">
+          <div class="ripple"></div>
+          <div class="screen">
+            <div class="island"><span class="il"><b id="isNo">٢٥</b>طلبك جاهز</span><span class="il">☕</span></div>
+            <div class="clock"><small id="pDate">الجمعة ٢٧ نوفمبر</small><b>٩:٤١</b></div>
+            <div class="banner">
+              <span class="logo"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 16a1 1 0 0 0 .9 1.5h13.6a1 1 0 0 0 .9-1.5L18 12.6V9a6 6 0 0 0-6-6Zm-2.6 16a2.7 2.7 0 0 0 5.2 0Z"/></svg></span>
+              <div><b id="bTitle">طلبك جاهز</b><span id="bBody">رقم ٢٥ · تفضّل استلمه من الكاشير</span></div>
+              <time>الحين</time>
+            </div>
+            <div class="live">
+              <div class="row">
+                <span class="logo"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 16a1 1 0 0 0 .9 1.5h13.6a1 1 0 0 0 .9-1.5L18 12.6V9a6 6 0 0 0-6-6Zm-2.6 16a2.7 2.7 0 0 0 5.2 0Z"/></svg></span>
+                <div class="t"><b>كوفي الحارة</b><span id="lState">نحضّر طلبك</span></div>
+                <span class="no" id="lNo">٢٥</span>
+              </div>
+              <div class="bar"><i id="lBar"></i></div>
+              <div class="steps"><span class="on">استلمنا</span><span class="on" id="s2">نحضّره</span><span id="s3">جاهز</span></div>
+            </div>
+            <div class="home"></div>
+          </div>
+        </div>
+        <p class="sr" aria-live="polite" id="live"></p>
+      </div>
+    </div>
+    <div class="stub">
+      <div class="num"><small>رقمك</small><span id="stubNo">٢٥</span></div>
+      <div class="say">كل طلب صار تذكرة على جوال عميلك: يشوف مراحل طلبه، ويوصله «طلبك جاهز» على شاشة القفل، و«نداء أخير» لو تأخر.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== البيجر القديم ===== -->
+<section class="wrap rise">
+  <div class="old">
+    <div>
+      <p class="kicker">ليش تنسى البيجر القديم؟</p>
+      <h2>جوال عميلك ما ينضاع.</h2>
+      <p class="sub">البيجر القديم ينضاع وينكسر ويخلص شحنه، ويتنقّل بين الأيادي طول اليوم. جوال العميل معه دايم.</p>
+      <ul class="vs">
+        <li class="head"><span>البيجر القديم</span><span>مع Tonsa</span></li>
+        <li><span class="was">أجهزة تشتريها وتصلّحها</span><span class="now">جوال أو آيباد عند الكاشير، وبس</span></li>
+        <li><span class="was">العميل لازم يبقى قريب</span><span class="now">يطلع لسيارته ويوصله التنبيه</span></li>
+        <li><span class="was">صوت واحد ما يعرف وش يقول</span><span class="now">«طلبك جاهز» ورقم الطلب على الشاشة</span></li>
+        <li><span class="was">تعقيم وشحن كل يوم</span><span class="now">ولا شي تلمسه بيدك</span></li>
+      </ul>
+    </div>
+    <div class="graveyard" aria-hidden="true" id="grave">
+      <div class="pg" style="top:34px;right:40px;transform:rotate(-14deg)"><i></i></div>
+      <div class="pg" style="top:120px;right:170px;transform:rotate(9deg)"><i></i></div>
+      <div class="pg" style="top:200px;right:60px;transform:rotate(22deg)"><i></i></div>
+      <div class="pg" style="top:60px;left:50px;transform:rotate(-4deg)"><i></i></div>
+      <div class="pg" style="top:190px;left:90px;transform:rotate(-20deg)"><i></i></div>
+      <span class="tag" style="top:22px;right:140px">انضاع <b class="x">✕</b></span>
+      <span class="tag" style="top:170px;right:230px">خلص شحنه <b class="x">✕</b></span>
+      <span class="tag" style="top:150px;left:20px">انكسر <b class="x">✕</b></span>
+      <span class="tag" style="bottom:22px;right:150px">ما رنّ <b class="x">✕</b></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== المنتجات ===== -->
+<section class="wrap rise">
+  <p class="kicker">ثلاث تذاكر</p>
+  <h2>اختر اللي يناسب محلك.</h2>
+  <p class="sub">كل واحد اشتراك لحاله. تقدر تاخذ واحد، أو تجمعهم.</p>
+  <div class="tickets">
+    <a class="tk pager" href="#pager">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 16a1 1 0 0 0 .9 1.5h13.6a1 1 0 0 0 .9-1.5L18 12.6V9a6 6 0 0 0-6-6Zm-2.6 16a2.7 2.7 0 0 0 5.2 0Z"/></svg></span>
+      <h3>البيجر</h3>
+      <p>للكوفيهات والمطاعم. العميل ينادى على جواله أول ما يجهز طلبه.</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>«طلبك جاهز» و«نداء أخير»</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>شعارك وألوانك على شاشة العميل</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>تقارير الزحمة ومتوسط الانتظار</li>
+      </ul>
+      <div class="foot"><span><small>يبدأ من</small> <b>٤٩</b> <small>ريال / شهر</small></span><span class="go">اعرف أكثر ←</span></div>
+    </a>
+    <a class="tk loy" href="#loyalty">
+      <span class="badge">جديد</span>
+      <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5 14.6 5l3.5-.4.4 3.5L21 10.6 19.4 14l.9 3.4-3.3 1.2L15 21.5l-3-1.8-3 1.8-2-2.9-3.3-1.2.9-3.4L3 10.6l2.5-2.5.4-3.5 3.5.4Z"/></svg></span>
+      <h3>بطاقة الولاء</h3>
+      <p>بطاقة أختام على جوال عميلك. كل طلب ختم، وآخر ختم مكافأة.</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>تصمّمها على كيفك</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>الكاشير يمسح بطاقة العميل ويختم</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>تعرف مين بدا يغيب وترجعه</li>
+      </ul>
+      <div class="foot"><span><small>يبدأ من</small> <b>٣٩</b> <small>ريال / شهر</small></span><span class="go">جرّبها ←</span></div>
+    </a>
+    <a class="tk wash" href="#wash">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.5 6.5A2.5 2.5 0 0 1 8.8 5h6.4a2.5 2.5 0 0 1 2.3 1.5L19 10h.5A1.5 1.5 0 0 1 21 11.5V16a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1v-4.5A1.5 1.5 0 0 1 4.5 10H5Zm1.8 3.5h7.4l-1-2.6a.6.6 0 0 0-.6-.4H9.9a.6.6 0 0 0-.6.4ZM7 12.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm10 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></svg></span>
+      <h3>المغاسل</h3>
+      <p>العميل يسجّل سيارته بنفسه، ويجيه «سيارتك جاهزة» وهو قاعد.</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>اللوحة واللون والخدمات عندك</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>أسعارك والمجموع جاهز</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>اتصال بالعميل بضغطة</li>
+      </ul>
+      <div class="foot"><span><small>يبدأ من</small> <b>٧٩</b> <small>ريال / شهر</small></span><span class="go">شوف كيف ←</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ===== كيف يشتغل ===== -->
+<section class="wrap rise">
+  <p class="kicker">كيف يشتغل</p>
+  <h2>ثلاث خطوات، ولا وحدة منها صعبة.</h2>
+  <div class="how">
+    <div class="step"><span class="n">١</span><h3>يمسح الكود</h3><p>الكاشير يكتب رقم الطلب من الفاتورة، والعميل يمسح الكود بكاميرا جواله.</p></div>
+    <div class="step"><span class="n">٢</span><h3>ينسى ويرتاح</h3><p>تطلع له تذكرة فيها رقمه ومراحل طلبه. يقفل جواله ويجلس أو يطلع لسيارته.</p></div>
+    <div class="step"><span class="n">٣</span><h3>تضغط «جاهز»</h3><p>يرن جواله على طول بتنبيه «طلبك جاهز»، ولو تأخر تضغط «نداء أخير».</p></div>
+  </div>
+</section>
+
+<!-- ===== بطاقة الولاء ===== -->
+<section class="wrap rise" id="loyalty">
+  <div class="loyal">
+    <div>
+      <p class="kicker">بطاقة الولاء</p>
+      <h2>بطاقة يتحمّس عميلك يكمّلها.</h2>
+      <p class="sub">مو كرت ورقي ينضاع في المحفظة. بطاقة أختام على جواله بتصميم محلك، والكاشير يختمها بمسحة.</p>
+      <ul class="checks">
+        <li><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.7-5.5 5.5a1 1 0 0 1-1.4 0l-2.5-2.5 1.4-1.4 1.8 1.8 4.8-4.8Z"/></svg><div><b>تصمّمها على كيفك</b><span>قوالب جاهزة، ألوانك وشعارك، ونقشات سدو ونجدي وحبوب قهوة.</span></div></li>
+        <li><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.7-5.5 5.5a1 1 0 0 1-1.4 0l-2.5-2.5 1.4-1.4 1.8 1.8 4.8-4.8Z"/></svg><div><b>تبدأ بأختام هدية</b><span>البطاقة اللي تبدأ بختمين، العميل يكمّلها أسرع.</span></div></li>
+        <li><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.7-5.5 5.5a1 1 0 0 1-1.4 0l-2.5-2.5 1.4-1.4 1.8 1.8 4.8-4.8Z"/></svg><div><b>ترجّع اللي بدا يغيب</b><span>قائمة بالعملاء اللي كانوا يجون كثير ووقفوا، وتنبيه «قرّبت» لما يبقى له ختم.</span></div></li>
+        <li><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.7-5.5 5.5a1 1 0 0 1-1.4 0l-2.5-2.5 1.4-1.4 1.8 1.8 4.8-4.8Z"/></svg><div><b>مستويات للعميل</b><span>برونزي ثم فضي ثم ذهبي، كل ما كمّل بطاقات أكثر.</span></div></li>
+      </ul>
+      <div class="chips" aria-label="من القوالب">
+        <span><i style="background:#0F0F10;box-shadow:inset 0 0 0 3px #E3B653"></i>أسود ذهبي</span>
+        <span><i style="background:#7A3B22"></i>نجدي</span>
+        <span><i style="background:#4A1414"></i>سدو</span>
+        <span><i style="background:#0B5E57"></i>بحري</span>
+        <span><i style="background:#F6DCE4;box-shadow:inset 0 0 0 3px #9C2A55"></i>وردي</span>
+        <span><i style="background:#2E1B10"></i>حبوب القهوة</span>
+      </div>
+    </div>
+    <div class="loyal-stage">
+      <div id="card"></div>
+      <button class="stampbtn" id="stamp" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 3h6v5.2a3 3 0 0 0 1 2.2l1 .9a2 2 0 0 1 .7 1.5V14H6.3v-1.2a2 2 0 0 1 .7-1.5l1-.9a3 3 0 0 0 1-2.2ZM5 16h14v2H5Zm1 3h12v2H6Z"/></svg>اختم ختم</button>
+      <p class="note" id="cardNote" aria-live="polite">جرّب: اضغط واختم مثل الكاشير</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== المغسلة ===== -->
+<section class="wrap rise" id="wash">
+  <div class="washsec">
+    <div class="carcard" aria-label="مثال طلب مغسلة">
+      <div class="plate" role="img" aria-label="لوحة سيارة: ح ق ب ٤٥٦٧">
+        <div><span>٤٥٦٧</span><span>4567</span></div>
+        <div><span>ح ق ب</span><span>J Q B</span></div>
+        <div class="ksa"><i></i>KSA</div>
+      </div>
+      <div class="wash-line"><span>غسيل خارجي وداخلي</span><b>٣٥ ر.س</b></div>
+      <div class="wash-line"><span>تلميع</span><b>٢٠ ر.س</b></div>
+      <div class="wash-line"><span>معطّر</span><b>١٠ ر.س</b></div>
+      <div class="wash-total"><span>المجموع</span><span>٦٥ ر.س</span></div>
+      <div class="wash-ready"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 16a1 1 0 0 0 .9 1.5h13.6a1 1 0 0 0 .9-1.5L18 12.6V9a6 6 0 0 0-6-6Zm-2.6 16a2.7 2.7 0 0 0 5.2 0Z"/></svg>سيارتك جاهزة</div>
+    </div>
+    <div>
+      <p class="kicker">للمغاسل</p>
+      <h2>العميل يسجّل سيارته بنفسه.</h2>
+      <p class="sub">يمسح الكود، يكتب لوحته ولون سيارته ويختار الخدمات. توصلك عندك بالمجموع، وأول ما تخلص تضغط «جاهزة» ويوصله التنبيه وهو قاعد في الاستراحة أو في المقهى اللي جنبك.</p>
+      <ul class="checks">
+        <li><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.7-5.5 5.5a1 1 0 0 1-1.4 0l-2.5-2.5 1.4-1.4 1.8 1.8 4.8-4.8Z"/></svg><div><b>خدماتك وأسعارك</b><span>تحددها مرة وحدة، والعميل يختار منها.</span></div></li>
+        <li><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.7 7.7-5.5 5.5a1 1 0 0 1-1.4 0l-2.5-2.5 1.4-1.4 1.8 1.8 4.8-4.8Z"/></svg><div><b>لوحة باركود جاهزة للطباعة</b><span>تعلّقها عند المدخل وخلاص.</span></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== للموظفين ===== -->
+<section class="wrap rise">
+  <p class="kicker">للكاشير</p>
+  <h2>مصمم لوقت الزحمة.</h2>
+  <p class="sub">كل شي في التطبيق مسوّى عشان الكاشير يخلص بسرعة، حتى والطابور طويل.</p>
+  <div class="staff">
+    <div class="feat"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7Z"/></svg><h3>وضع الزحمة</h3><p>أزرار أكبر، وضغطة وحدة تخلي الطلب جاهز.</p></div>
+    <div class="feat"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 4a8 8 0 1 1-7.7 10H6.4A6 6 0 1 0 8 7.8L10 10H3V3l2.5 2.5A8 8 0 0 1 12 4Z"/></svg><h3>تراجع خلال ٥ ثواني</h3><p>ضغطت «جاهز» بالغلط؟ ترجعها على طول.</p></div>
+    <div class="feat"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 5v5.6l3.7 2.2-1 1.7L11 13.7V7Z"/></svg><h3>المتأخر يصير أحمر</h3><p>أي طلب طوّل يبان لك قبل ما يزعل العميل.</p></div>
+    <div class="feat"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 10v4h4l5 4V6L7 10Zm13.5 2A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4ZM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6Z"/></svg><h3>نداء جماعي</h3><p>كل الطلبات الجاهزة تنادى بضغطة وحدة.</p></div>
+    <div class="feat"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.5 8.5a14 14 0 0 1 19 0L20 10a12 12 0 0 0-16 0Zm3.5 3.5a9 9 0 0 1 12 0l-1.5 1.5a7 7 0 0 0-9 0ZM12 15a3 3 0 0 1 2 .8L12 18l-2-2.2A3 3 0 0 1 12 15ZM3.7 2.3l18 18-1.4 1.4-18-18Z"/></svg><h3>يكمل بدون نت</h3><p>لو انقطع النت يكمل شغله، ويرسل أول ما يرجع.</p></div>
+    <div class="feat"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm2 12v2h2v-2Zm4-4v6h2v-6Zm4-4v10h2V7Z"/></svg><h3>تقارير تفهمها</h3><p>عدد الطلبات، ومتوسط الانتظار، وأزحم ساعة في يومك.</p></div>
+  </div>
+</section>
+
+<!-- ===== الأسعار ===== -->
+<section class="wrap rise" id="prices">
+  <p class="kicker">الأسعار</p>
+  <h2>سعر واضح، وبدون أجهزة.</h2>
+  <p class="sub">الأسعار لكل فرع شهريًا. جرّب كل مميزات الاحترافية ١٤ يوم مجانًا، وبعدها اختر.</p>
+  <div class="prices">
+    <div class="price">
+      <h3><svg viewBox="0 0 24 24" fill="var(--red)" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.3 16a1 1 0 0 0 .9 1.5h13.6a1 1 0 0 0 .9-1.5L18 12.6V9a6 6 0 0 0-6-6Zm-2.6 16a2.7 2.7 0 0 0 5.2 0Z"/></svg>البيجر</h3>
+      <div class="tiers">
+        <div class="tier"><small>الأساسية</small><b>٤٩</b><i>ريال / شهر</i></div>
+        <div class="tier pro"><small>الاحترافية</small><b>٩٩</b><i>ريال / شهر</i></div>
+      </div>
+      <p>للكوفيهات والمطاعم. الاحترافية فيها شكلك على الشاشة والتقارير الكاملة.</p>
+    </div>
+    <div class="price">
+      <h3><svg viewBox="0 0 24 24" fill="#C08A00" aria-hidden="true"><path d="M12 2.5 14.6 5l3.5-.4.4 3.5L21 10.6 19.4 14l.9 3.4-3.3 1.2L15 21.5l-3-1.8-3 1.8-2-2.9-3.3-1.2.9-3.4L3 10.6l2.5-2.5.4-3.5 3.5.4Z"/></svg>بطاقة الولاء</h3>
+      <div class="tiers">
+        <div class="tier"><small>الأساسية</small><b>٣٩</b><i>ريال / شهر</i></div>
+        <div class="tier pro"><small>الاحترافية</small><b>٥٩</b><i>ريال / شهر</i></div>
+      </div>
+      <p>اشتراك لحاله. الاحترافية فيها التصميم الكامل والمستويات والتنبيهات.</p>
+    </div>
+    <div class="price">
+      <h3><svg viewBox="0 0 24 24" fill="#2F6FE4" aria-hidden="true"><path d="M6.5 6.5A2.5 2.5 0 0 1 8.8 5h6.4a2.5 2.5 0 0 1 2.3 1.5L19 10h.5A1.5 1.5 0 0 1 21 11.5V16a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1v-4.5A1.5 1.5 0 0 1 4.5 10H5Z"/></svg>المغاسل</h3>
+      <div class="tiers">
+        <div class="tier"><small>الأساسية</small><b>٧٩</b><i>ريال / شهر</i></div>
+        <div class="tier pro"><small>الاحترافية</small><b>١٤٩</b><i>ريال / شهر</i></div>
+      </div>
+      <p>تسجيل السيارة من العميل، وخدماتك وأسعارك، وتنبيه «سيارتك جاهزة».</p>
+    </div>
+  </div>
+  <div class="deals">
+    <span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h10v2h3v4a5 5 0 0 1-4.1 4.9A5 5 0 0 1 13 15.9V18h3v3H8v-3h3v-2.1a5 5 0 0 1-2.9-3A5 5 0 0 1 4 8V4h3Zm0 4H6v2a3 3 0 0 0 1 2.2Zm10 0v4.2A3 3 0 0 0 18 8V6Z"/></svg>١٤ يوم مجانًا بكل المميزات</span>
+    <span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2Zm-2 8h14v9H5Z"/></svg>السنوي: تدفع ١٠ شهور وتاخذ ١٢</span>
+    <span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 7h-2.2A3 3 0 0 0 12 4.4 3 3 0 0 0 6.2 7H4a1 1 0 0 0-1 1v3h18V8a1 1 0 0 0-1-1Zm-11-1a1 1 0 0 1 2 1H9a1 1 0 0 1 0-1Zm6 0a1 1 0 0 1 0 1h-2a1 1 0 0 1 2-1ZM4 13v7a1 1 0 0 0 1 1h6v-8Zm9 8h6a1 1 0 0 0 1-1v-7h-7Z"/></svg>جيب محل ثاني، والاثنين ياخذون شهر مجاني</span>
+  </div>
+  <p style="margin-top:22px"><a class="btn btn-line" href="pricing.html">قارن كل المميزات</a></p>
+</section>
+
+<!-- ===== الأسئلة ===== -->
+<section class="wrap rise" id="faq">
+  <p class="kicker">أسئلة</p>
+  <h2>اللي يسألون عنه دايم.</h2>
+  <div class="faq">
+    <details><summary>العميل لازم يحمّل تطبيق؟</summary><p>لا. يمسح الكود بكاميرا جواله وتطلع له التذكرة على طول. يشتغل على الآيفون والأندرويد.</p></details>
+    <details><summary>يوصله التنبيه والجوال مقفل؟</summary><p>إيه. يطلع «طلبك جاهز» على شاشة القفل مع صوت، ولو تأخر تضغط «نداء أخير» ويوصله مرة ثانية.</p></details>
+    <details><summary>أحتاج أجهزة أو ربط مع الكاشير؟</summary><p>لا. جوال أو آيباد عند الكاشير وكود مطبوع، وبس. الكاشير يكتب رقم الطلب من الفاتورة.</p></details>
+    <details><summary>بطاقة الولاء تجي مع البيجر؟</summary><p>لا، بطاقة الولاء اشتراك لحاله. تقدر تشترك فيها لحالها، أو تجمعها مع البيجر.</p></details>
+    <details><summary>وش يصير بعد الـ ١٤ يوم؟</summary><p>تختار الباقة اللي تناسبك وتكمل، وكل إعداداتك وتصميمك يبقى مثل ما هو.</p></details>
+    <details><summary>بيانات عملائي آمنة؟</summary><p>ما نطلب من العميل يسوّي حساب. نحفظ بس اللي يحتاجه الطلب أو البطاقة، وتقدر تقرأ التفاصيل في <a href="privacy.html">صفحة الخصوصية</a>.</p></details>
+  </div>
+</section>
+
+<!-- ===== النهاية ===== -->
+<section class="wrap rise">
+  <div class="final">
+    <div class="big" aria-hidden="true" id="finalNo">٢٦</div>
+    <div>
+      <h2>الطلب الجاي، خلّه على Tonsa.</h2>
+      <p>كلّمنا على الواتساب ونجهّز لك محلك اليوم، وتجرّب كل شي ١٤ يوم مجانًا.</p>
+      <div class="actions">
+        <a class="btn btn-red" href="https://wa.me/966505484034?text=%D8%A3%D8%A8%D9%8A%20%D8%A3%D8%AC%D8%B1%D8%A8%20Tonsa%20%D9%85%D8%AC%D8%A7%D9%86%D9%8B%D8%A7"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.8-.1 1.4z"/></svg>كلّمنا واتساب</a>
+        <a class="btn btn-line" href="mailto:waled26252@gmail.com">راسلنا بالإيميل</a>
+      </div>
+    </div>
+  </div>
+</section>
 </main>
-<footer class="wrap">© 2026 Tonsa · <a href="https://digitalinsights.sa">رؤى الرقمية</a> · <a href="support.html">الدعم</a> · <a href="privacy.html">الخصوصية</a></footer></body></html>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="./"><img src="icon.png" alt="">Tonsa</a>
+    <a href="pricing.html">الباقات</a>
+    <a href="support.html">الدعم</a>
+    <a href="privacy.html">الخصوصية</a>
+    <span>© 2026 Tonsa · من <a href="https://digitalinsights.sa">رؤى الرقمية</a></span>
+  </div>
+</footer>
+
+<script src="loyal.js"></script>
+<script>
+(()=>{
+  const $=id=>document.getElementById(id);
+  const AR=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ===== تاريخ الجوال في العرض =====
+  try{$('pDate').textContent=new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-arab',{weekday:'long',day:'numeric',month:'long'}).format(new Date())}catch(e){}
+
+  // ===== العرض الحي للنداء =====
+  let no=25, stage=0, timer;
+  const phone=$('phone'), bar=$('lBar');
+  function setNo(){['ordNo','isNo','lNo','stubNo'].forEach(i=>$(i).textContent=AR(no));$('finalNo').textContent=AR(no+1)}
+  function chime(final){
+    try{
+      const ctx=new (window.AudioContext||window.webkitAudioContext)();
+      const notes=final?[880,660,880,660]:[784,988,1175];
+      notes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;
+        const t=ctx.currentTime+i*.16;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.5);
+        o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+.55)});
+    }catch(e){}
+    if(navigator.vibrate) navigator.vibrate(final?[200,100,200,100,300]:[180,80,180]);
+  }
+  function ring(){phone.classList.remove('ring');void phone.offsetWidth;phone.classList.add('ring')}
+  // التقدم يمشي لحاله قبل «جاهز»
+  function creep(){clearInterval(timer);let w=30;bar.style.width=w+'%';timer=setInterval(()=>{if(stage===0){w=Math.min(78,w+4);bar.style.width=w+'%'}},900)}
+  creep();
+  $('btnReady').onclick=()=>{
+    if(stage!==0) return; stage=1; clearInterval(timer);
+    bar.style.width='100%';
+    phone.classList.add('ready'); ring(); chime(false);
+    $('ordState').textContent='جاهز'; $('lState').textContent='طلبك جاهز! تفضّل'; $('s3').classList.add('on');
+    $('bTitle').textContent='طلبك جاهز'; $('bBody').textContent=`رقم ${AR(no)} · تفضّل استلمه من الكاشير`;
+    $('btnReady').disabled=true; $('btnReady').classList.remove('pulse'); $('btnLast').disabled=false; $('btnReset').hidden=false;
+    $('hint').textContent='وصل التنبيه حتى والجوال مقفل. لو العميل تأخر، جرّب «نداء أخير».';
+    $('live').textContent=`وصل للعميل: طلبك جاهز، رقم ${no}`;
+  };
+  $('btnLast').onclick=()=>{
+    if(stage!==1) return; stage=2;
+    phone.classList.add('final'); ring(); chime(true);
+    $('bTitle').textContent='نداء أخير'; $('bBody').textContent=`طلبك رقم ${AR(no)} ينتظرك عند الكاشير`;
+    $('ordState').textContent='نداء أخير'; $('btnLast').disabled=true;
+    $('hint').textContent='هذا كل شي. بدون بيجر، وبدون ما ينادي أحد بصوت عالي.';
+    $('live').textContent=`نداء أخير للطلب رقم ${no}`;
+  };
+  $('btnReset').onclick=()=>{
+    stage=0; no++; setNo();
+    phone.classList.remove('ready','final','ring');
+    $('ordState').textContent='نحضّره'; $('lState').textContent='نحضّر طلبك'; $('s3').classList.remove('on');
+    $('btnReady').disabled=false; $('btnReady').classList.add('pulse'); $('btnLast').disabled=true; $('btnReset').hidden=true;
+    $('hint').textContent='طلب جديد. اضغط «جاهز» لما يخلص.';
+    creep();
+  };
+  setNo();
+
+  // ===== بطاقة الولاء الحية =====
+  const st=document.createElement('style'); st.textContent=LoyalCard.css; document.head.appendChild(st);
+  const card={stamps:2,rewards:0,redeemed:3,visits:9,name:'',member:'',
+    shop:{name:'كوفي الحارة'},
+    cfg:{goal:8,icon:'cup',reward_ar:'قهوتك علينا',title:'نادي القهوة',message:'أول ختمين علينا',
+      color:'#2E1B10',color2:'#5A3A22',accent:'#EAD3B3',pattern:'beans',font:'kufi',corners:'ticket',anim:'ink',tiers:true,
+      hours:'07:00-01:00',terms:'ختم لكل طلب'}};
+  let prev=null;
+  function draw(){
+    $('card').innerHTML=LoyalCard.html(card,{ar:true,qr:false,prev,width:294});
+    LoyalCard.attach($('card'));
+  }
+  draw();
+  $('stamp').onclick=()=>{
+    const goal=card.cfg.goal;
+    if(card.stamps>=goal){card.stamps=0;card.rewards=0;card.redeemed++;prev=null;$('cardNote').textContent='بطاقة جديدة! والمستوى يرتفع كل ما كمّل.';draw();return}
+    prev=card.stamps; card.stamps++;
+    if(card.stamps>=goal){card.rewards=1;$('cardNote').textContent='كمّلت البطاقة. قهوتك علينا!';$('stamp').lastChild.textContent='ابدأ بطاقة جديدة'}
+    else{$('cardNote').textContent=goal-card.stamps===1?'باقي ختم واحد! هنا يوصله تنبيه «قرّبت».':`باقي ${AR(goal-card.stamps)} وتاخذ المكافأة`;$('stamp').lastChild.textContent='اختم ختم'}
+    draw();
+  };
+
+  // ===== ظهور الأقسام =====
+  if(!reduce && 'IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+    document.querySelectorAll('.rise').forEach(el=>io.observe(el));
+  }else document.querySelectorAll('.rise').forEach(el=>el.classList.add('in'));
+})();
+</script>
+</body>
+</html>
