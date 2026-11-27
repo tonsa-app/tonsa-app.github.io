@@ -245,6 +245,30 @@ h2{font:700 clamp(34px,5vw,56px)/1.1 var(--display);margin:0 0 16px;letter-spaci
 .feat h3{font-size:18px;margin:12px 0 4px}
 .feat p{margin:0;color:var(--muted);font-size:15px;line-height:1.6}
 
+/* كل المميزات (من features.js) */
+.ftabs{display:flex;gap:8px;flex-wrap:wrap;margin:30px 0 22px}
+.ftabs button{min-height:44px;padding:0 18px;border-radius:999px;border:0;background:var(--soft);color:var(--ink);font:700 15px/1 inherit;font-family:inherit;cursor:pointer}
+.ftabs button[aria-pressed=true]{background:var(--ink);color:var(--ground)}
+.fblock{margin-top:26px}
+.fblock>h3{display:flex;align-items:center;gap:10px;font:700 26px/1.2 var(--display);margin:0 0 14px}
+.fblock>h3 i{width:12px;height:12px;border-radius:50%}
+.fgroups{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.fgroup{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:20px 22px}
+.fgroup h4{margin:0 0 6px;font-size:14px;color:var(--muted);font-weight:700}
+.fgroup ul{list-style:none;margin:0;padding:0}
+.fgroup li{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:10px;align-items:flex-start}
+.fgroup li:first-child{border-top:0}
+.fgroup li svg{width:18px;height:18px;flex:none;margin-top:5px}
+.fgroup li b{font-size:16px;font-weight:700}
+.fgroup li span.d{display:block;color:var(--muted);font-size:14.5px;line-height:1.5}
+.fb{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px;margin-inline-start:6px;vertical-align:2px}
+.fb.pro{background:color-mix(in srgb,var(--saffron) 30%,var(--paper));color:#7A5200}
+.fb.soon{background:color-mix(in srgb,#5B6CF0 16%,var(--paper));color:#4553C9}
+@media (prefers-color-scheme:dark){.fb.pro{color:#F5C85A}.fb.soon{color:#9AA5FF}}
+.fgroup li{break-inside:avoid}
+@media (min-width:900px){.fgroup:only-child ul{columns:2;column-gap:36px}.fgroup:only-child li:nth-child(2){border-top:1px solid var(--line)}}
+.flegend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-top:18px}
+
 /* الأسعار */
 .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
 .price{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:26px;display:flex;flex-direction:column;gap:16px}
@@ -315,6 +339,7 @@ footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
       <a href="#pager">البيجر</a>
       <a href="#loyalty">بطاقة الولاء</a>
       <a href="#wash">المغاسل</a>
+      <a href="#features">المميزات</a>
       <a href="#prices">الأسعار</a>
       <a href="#faq">أسئلة</a>
     </nav>
@@ -539,6 +564,22 @@ footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
   </div>
 </section>
 
+<!-- ===== كل المميزات ===== -->
+<!-- ✏️ القائمة نفسها تتعدّل من ملف features.js -->
+<section class="wrap rise" id="features">
+  <p class="kicker">كل المميزات</p>
+  <h2>كل اللي في التطبيق، بالتفصيل.</h2><!-- ✏️ -->
+  <p class="sub">اختر اللي يهمك وشوف وش تاخذ في كل باقة.</p>
+  <div class="ftabs" role="group" aria-label="اختر المنتج">
+    <button type="button" data-f="all" aria-pressed="true">الكل</button>
+    <button type="button" data-f="pager" aria-pressed="false">البيجر</button>
+    <button type="button" data-f="wash" aria-pressed="false">المغاسل</button>
+    <button type="button" data-f="loyalty" aria-pressed="false">بطاقة الولاء</button>
+  </div>
+  <div id="flist"></div>
+  <div class="flegend"><span><span class="fb pro">احترافية</span> في الباقة الاحترافية بس</span><span><span class="fb soon">قريبًا</span> نشتغل عليها الحين</span></div>
+</section>
+
 <!-- ===== الأسعار ===== -->
 <section class="wrap rise" id="prices">
   <p class="kicker">الأسعار</p>
@@ -618,6 +659,7 @@ footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
   </div>
 </footer>
 
+<script src="https://tonsa-app.github.io/features.js"></script>
 <script src="https://tonsa-app.github.io/loyal.js"></script>
 <script>
 (()=>{
@@ -630,6 +672,23 @@ footer .brand{color:var(--ink);font-size:20px;margin-inline-end:auto}
     const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
     document.querySelectorAll('.rise').forEach(el=>io.observe(el));
   }else document.querySelectorAll('.rise').forEach(el=>el.classList.add('in'));
+
+
+  // ===== كل المميزات (من features.js) =====
+  const F=window.TONSA_FEATURES||[];
+  const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const tick='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>';
+  function showF(k){
+    const want=k==='all'?F:F.filter(p=>p.id===k||(p.id==='both'&&(k==='pager'||k==='wash')));
+    $('flist').innerHTML=want.map(p=>`<div class="fblock"><h3><i style="background:${esc(p.color)}"></i>${esc(p.name)}</h3><div class="fgroups">${
+      p.groups.map(g=>`<div class="fgroup"><h4>${esc(g.title)}</h4><ul>${
+        g.items.map(it=>`<li style="color:${esc(p.color)}">${tick}<div style="color:var(--ink)"><b>${esc(it.t)}</b>${it.pro?'<span class="fb pro">احترافية</span>':''}${it.soon?'<span class="fb soon">قريبًا</span>':''}${it.d?`<span class="d">${esc(it.d)}</span>`:''}</div></li>`).join('')
+      }</ul></div>`).join('')
+    }</div></div>`).join('');
+  }
+  document.querySelectorAll('.ftabs button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.ftabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));showF(b.dataset.f)});
+  showF('all');
 
   // ===== تاريخ الجوال في العرض =====
   try{$('pDate').textContent=new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-arab',{weekday:'long',day:'numeric',month:'long'}).format(new Date())}catch(e){}
