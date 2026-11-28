@@ -63,6 +63,16 @@ button,.btn{display:flex;align-items:center;justify-content:center;gap:8px;width
 .bill div{display:flex;justify-content:space-between;padding:4px 0;font-variant-numeric:tabular-nums}
 .bill .t{border-top:1px dashed rgba(127,127,127,.4);margin-top:6px;padding-top:8px;font-weight:800}
 .bill p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.offer{position:relative;z-index:1;width:100%;max-width:340px;margin-top:16px;background:var(--paper);border-radius:22px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.12);border:2px solid var(--saffron);text-align:center}
+.offer small{display:block;color:var(--muted);font-weight:700;font-size:13px}
+.offer b{display:block;font-size:20px;margin:4px 0 12px}
+.offer .row{display:flex;gap:8px}.offer .row button{flex:1}
+.offer .yes{background:var(--saffron);color:var(--sink)}.offer .no{background:rgba(127,127,127,.12);color:var(--ink)}
+.checked{color:var(--muted);font-size:14px;margin:8px 0 0;font-weight:600}
+.remind{position:relative;z-index:1;width:100%;max-width:340px;margin-top:16px;background:var(--paper);border-radius:22px;padding:14px 16px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.remind p{margin:0 0 10px;color:var(--muted);font-size:15px}
+.remind .on{color:#1E8E3E;font-weight:700;margin:0}
+.remind .link{background:none;color:var(--muted);min-height:44px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
 footer{margin-top:auto;padding-top:26px;color:var(--muted);font-size:13px}
 footer a{color:inherit}
 </style></head><body>
@@ -75,6 +85,7 @@ footer a{color:inherit}
  </div>
 </main>
 <div class="track" id="track" role="img" aria-label="مرحلة طلبك"><div>استلمنا</div><div>نحضّره</div><div>جاهز</div><div>استلمته</div></div>
+<div class="offer" id="offer" hidden role="alert"><small id="offerFrom">عرض من المغسلة</small><b id="offerQ"></b><div class="row"><button class="yes" id="offerYes" type="button">أبي</button><button class="no" id="offerNo" type="button">لا شكرًا</button></div></div>
 <div class="bill" id="bill" hidden></div>
 <section class="loyal" id="loyal" hidden aria-label="بطاقة الأختام"></section>
 <div class="rate hidden" id="rate">
@@ -82,6 +93,7 @@ footer a{color:inherit}
     <button data-r="1" aria-label="تقييم 1 من 5">😞</button><button data-r="2" aria-label="تقييم 2 من 5">😕</button><button data-r="3" aria-label="تقييم 3 من 5">😐</button><button data-r="4" aria-label="تقييم 4 من 5">🙂</button><button data-r="5" aria-label="تقييم 5 من 5">😍</button></div></div>
   <div id="rateDone" class="hidden"><b id="rateMsg"></b><a id="google" class="gbtn hidden" target="_blank" rel="noopener">⭐ قيّمنا في قوقل</a></div>
 </div>
+<div class="remind" id="remind" hidden><div id="remindAsk"><p id="remindTxt">نذكّرك بالغسلة الجاية؟</p><button class="primary" id="remindBtn" type="button">🔔 ذكّرني</button></div><div id="remindOn" hidden><p class="on" id="remindOnTxt"></p><button class="link" id="remindOff" type="button">ما أبي تذكير</button></div></div>
 <button class="share" id="share" type="button">↗ شارك التذكرة مع صاحبك</button>
 <button class="share" id="saveimg" type="button">📷 احفظ التذكرة صورة</button>
 <div class="cta">
@@ -136,6 +148,12 @@ bn:{'رقم طلبك':'আপনার অর্ডার নম্বর','سي
  'استلمنا سيارتك':'আমরা আপনার গাড়ি পেয়েছি','بنبدأ عليها الحين':'এখনই কাজ শুরু করছি','نغسل سيارتك 🧽':'আপনার গাড়ি ধোয়া হচ্ছে 🧽','بنرسل لك تنبيه أول ما تخلص':'শেষ হলেই আমরা জানাব','سيارتك جاهزة 🚗✨':'আপনার গাড়ি তৈরি 🚗✨','تفضل استلمها':'অনুগ্রহ করে নিয়ে যান','الله يسلمك!':'নিরাপদে যান!',
  '🔔 فعّل التنبيه':'🔔 নোটিফিকেশন চালু করুন','اضغط مرة وحدة، ونرسل لك تنبيه أول ما يجهز طلبك حتى لو جوالك مقفل.':'একবার চাপুন, অর্ডার তৈরি হলেই জানাব, ফোন লক থাকলেও।','✓ التنبيه مفعّل. تقدر تقفل جوالك الحين.':'✓ নোটিফিকেশন চালু। এখন ফোন লক করতে পারেন।',
  'افتح تذكرتك في Tonsa':'Tonsa-তে আপনার টিকিট খুলুন','المجموع':'মোট','💵 الدفع عند السيارة':'💵 গাড়িতে পেমেন্ট','ر.س':'রিয়াল','وش رأيك بالغسيل؟':'ধোয়া কেমন হলো?','وش رأيك بطلبك؟':'আপনার অর্ডার কেমন ছিল?','📷 احفظ التذكرة صورة':'📷 টিকিটের ছবি সেভ করুন','↗ شارك التذكرة مع صاحبك':'↗ বন্ধুকে টিকিট পাঠান','لحظة…':'এক মুহূর্ত…'}};
+
+Object.assign(EN,{"عرض من المغسلة": "An offer from the car wash", "أبي": "Yes please", "لا شكرًا": "No thanks", "نذكّرك بالغسلة الجاية؟": "Want a reminder for your next wash?", "🔔 ذكّرني": "🔔 Remind me", "ما أبي تذكير": "No reminder", "✓ فحصنا": "✓ Checked"});
+Object.assign(MORE.ur,{"عرض من المغسلة": "کار واش کی طرف سے پیشکش", "أبي": "جی ہاں", "لا شكرًا": "نہیں، شکریہ", "نذكّرك بالغسلة الجاية؟": "اگلی دھلائی کی یاد دہانی؟", "🔔 ذكّرني": "🔔 یاد دلائیں", "ما أبي تذكير": "یاد دہانی نہیں", "✓ فحصنا": "✓ چیک کیا"});
+Object.assign(MORE.hi,{"عرض من المغسلة": "कार वॉश से ऑफ़र", "أبي": "हाँ", "لا شكرًا": "नहीं, शुक्रिया", "نذكّرك بالغسلة الجاية؟": "अगली धुलाई की याद दिलाएँ?", "🔔 ذكّرني": "🔔 याद दिलाएँ", "ما أبي تذكير": "याद नहीं चाहिए", "✓ فحصنا": "✓ जाँचा गया"});
+Object.assign(MORE.tl,{"عرض من المغسلة": "Alok mula sa car wash", "أبي": "Oo, gusto ko", "لا شكرًا": "Hindi, salamat", "نذكّرك بالغسلة الجاية؟": "Paalalahanan ka sa susunod na hugas?", "🔔 ذكّرني": "🔔 Paalalahanan ako", "ما أبي تذكير": "Walang paalala", "✓ فحصنا": "✓ Na-check"});
+Object.assign(MORE.bn,{"عرض من المغسلة": "কার ওয়াশের অফার", "أبي": "হ্যাঁ", "لا شكرًا": "না, ধন্যবাদ", "نذكّرك بالغسلة الجاية؟": "পরের ধোয়ার কথা মনে করাব?", "🔔 ذكّرني": "🔔 মনে করিয়ে দিন", "ما أبي تذكير": "মনে করাতে হবে না", "✓ فحصنا": "✓ পরীক্ষা করা হয়েছে"});
 const T=(s)=>isAr?s:((MORE[LANG]&&MORE[LANG][s])||EN[s]||s);
 if(!isAr){
   document.documentElement.lang=LANG; document.documentElement.dir=LANG==='ur'?'rtl':'ltr'; document.title=T(document.title);
@@ -232,7 +250,43 @@ async function load(){
 const PL={'أ':'A','ب':'B','ح':'J','د':'D','ر':'R','س':'S','ص':'X','ط':'T','ع':'E','ق':'G','ك':'K','ل':'L','م':'Z','ن':'N','هـ':'H','و':'U','ى':'V'};
 const ARD='٠١٢٣٤٥٦٧٨٩', ard=s=>String(s).replace(/\d/g,d=>ARD[d]);
 const CN={white:['أبيض','White'],black:['أسود','Black'],silver:['فضي','Silver'],grey:['رمادي','Grey'],red:['أحمر','Red'],blue:['أزرق','Blue'],green:['أخضر','Green'],beige:['بيج','Beige'],brown:['بني','Brown'],gold:['ذهبي','Gold']};
+const money=v=>isAr?`${ard(Number(v))} ${T('ر.س')}`:`${Number(v)} SAR`;
+let offerBusy=false;
+function offerUI(j){
+  const o=j.offer, box=$('offer');
+  if(!o||o.state!=='pending'||!['received','preparing'].includes(j.status)){ box.hidden=true; return; }
+  const Q={ar:`تبي نضيف ${o.name} بـ ${money(o.price)}؟`,ur:`${o.name} ${money(o.price)} میں شامل کریں؟`,hi:`${o.name} ${money(o.price)} में जोड़ें?`,tl:`Idagdag ang ${o.name} sa ${money(o.price)}?`,bn:`${money(o.price)}-তে ${o.name} যোগ করবেন?`};
+  $('offerQ').textContent=Q[LANG]||`Add ${o.name} for ${money(o.price)}?`;
+  if(box.hidden){ box.hidden=false; navigator.vibrate&&navigator.vibrate(60); }
+}
+async function answerOffer(yes){
+  if(offerBusy) return; offerBusy=true; $('offer').hidden=true;
+  await rpc('respond_offer',{p_id:id,p_accept:yes}); offerBusy=false; load();
+}
+$('offerYes').onclick=()=>answerOffer(true); $('offerNo').onclick=()=>answerOffer(false);
+function remindUI(j){
+  const box=$('remind');
+  const can=j.remind&&['ready','collected'].includes(j.status)&&!isIOS&&('PushManager' in window);
+  if(!can){ box.hidden=true; return; }
+  box.hidden=false;
+  const days=j.remind_days||14;
+  const R={ar:`نذكّرك بالغسلة الجاية بعد ${ard(days)} يوم؟`,ur:`${days} دن بعد اگلی دھلائی کی یاد دہانی؟`,hi:`${days} दिन बाद अगली धुलाई की याद दिलाएँ?`,tl:`Paalalahanan ka sa susunod na hugas pagkalipas ng ${days} araw?`,bn:`${days} দিন পর পরের ধোয়ার কথা মনে করাব?`};
+  $('remindTxt').textContent=R[LANG]||`Remind you about your next wash in ${days} days?`;
+  const on=!!j.remind_at;
+  $('remindAsk').hidden=on; $('remindOn').hidden=!on;
+  if(on){ const d=new Date(j.remind_at); $('remindOnTxt').textContent=(isAr?'✓ بنذكّرك يوم ':'✓ We\'ll remind you on ')+d.toLocaleDateString(isAr?'ar-SA-u-ca-gregory':LANG,{weekday:'long',day:'numeric',month:'long'}); }
+}
+$('remindBtn').onclick=async()=>{
+  const b=$('remindBtn'); b.disabled=true;
+  try{
+    let on=false; try{on=localStorage.getItem('tonsa-on-'+id)==='1'}catch(e){}
+    if(!on||Notification.permission!=='granted') await enable();
+    if(Notification.permission==='granted') await rpc('wash_remind',{p_id:id,p_on:true});
+  }finally{ b.disabled=false; load(); }
+};
+$('remindOff').onclick=async()=>{ await rpc('wash_remind',{p_id:id,p_on:false}); load(); };
 function wash(j){
+  offerUI(j); remindUI(j);
   if(!washed){
     washed=true;
     Object.assign(TXT,{received:[T('استلمنا سيارتك'),T('بنبدأ عليها الحين')],preparing:[T('نغسل سيارتك 🧽'),T('بنرسل لك تنبيه أول ما تخلص')],ready:[T('سيارتك جاهزة 🚗✨'),T('تفضل استلمها')],collected:[T('الله يسلمك!'),T('شكرًا لزيارتك')]});
@@ -251,11 +305,14 @@ function wash(j){
   const info=[j.car_color&&CN[j.car_color]?CN[j.car_color][isAr?0:1]:'',j.car_type||''].filter(Boolean).join(' · ');
   if(info){const c=document.createElement('div');c.className='car';c.textContent=info;num.appendChild(c);}
   const sv=Array.isArray(j.services)?j.services:[]; const bill=$('bill');
-  if(sv.length&&!bill.childElementCount){
+  const bkey=JSON.stringify(sv)+j.total+JSON.stringify(j.checked||[]);
+  if(sv.length&&bill.dataset.k!==bkey){
+    bill.dataset.k=bkey; bill.textContent='';
     const money=v=>isAr?`${ard(Number(v))} ${T('ر.س')}`:`${Number(v)} SAR`;
     sv.forEach(x=>{const d=document.createElement('div');const a=document.createElement('span');a.textContent=x.name;const b=document.createElement('b');b.textContent=money(x.price);d.append(a,b);bill.appendChild(d);});
     const t=document.createElement('div');t.className='t';const a=document.createElement('span');a.textContent=T('المجموع');const b=document.createElement('span');b.textContent=money(j.total||0);t.append(a,b);bill.appendChild(t);
     const p=document.createElement('p');p.textContent=T('💵 الدفع عند السيارة');bill.appendChild(p);
+    if(Array.isArray(j.checked)&&j.checked.length){const c=document.createElement('p');c.className='checked';c.textContent=T('✓ فحصنا')+': '+j.checked.join(' · ');bill.appendChild(c);}
     bill.hidden=false;
   }
 }

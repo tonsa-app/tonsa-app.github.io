@@ -57,6 +57,7 @@ details summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;alig
 
   <section id="app" class="hidden">
     <div id="reqs"></div>
+    <div id="soon"></div>
 
     <h2>كوفي جديد</h2>
     <div class="card">
@@ -126,6 +127,25 @@ function render(data) {
       <button class="soft" style="flex:0 0 auto" data-dismiss="${r.id}">تجاهل</button></div>
       <p class="meta">بعد ما يدفع، فعّل الباقة من كرت الكوفي تحت.</p></div>`;
   }).join('') : '';
+
+  // قرّب يخلص: اشتراكات تخلص خلال ٧ أيام، أو خلصت آخر ١٤ يوم وما تجددت
+  const ends = [];
+  for (const c of cafes) {
+    const add = (what, d) => { const n = days(d); if (n !== null && n <= 7 && n >= -14) ends.push({ c, what, d, n }); };
+    const paid = c.paid_until && Date.parse(c.paid_until), trial = c.trial_until && Date.parse(c.trial_until);
+    if (paid) add(c.plan === 'pro' ? 'الاحترافية' : 'الأساسية', c.paid_until);
+    else if (trial) add('التجربة', c.trial_until);
+    if (c.loyalty_until) add(c.loyalty_tier === 'pro' ? 'الولاء الاحترافية' : 'الولاء الأساسية', c.loyalty_until);
+  }
+  ends.sort((a, b) => a.n - b.n);
+  const remindTxt = (e) => e.n >= 0
+    ? `أهلًا ${e.c.name} 👋\nحبينا نذكّركم إن ${e.what} في Tonsa تخلص ${e.n === 0 ? 'اليوم' : `بعد ${e.n} ${e.n === 1 ? 'يوم' : 'أيام'}`} (${date(e.d)}).\nتبون نجدّدها لكم؟ 🙏`
+    : `أهلًا ${e.c.name} 👋\n${e.what} في Tonsa خلصت من ${-e.n} ${-e.n === 1 ? 'يوم' : 'أيام'}.\nتبون نرجّعها لكم؟ نجدّدها بدقيقة 🙏`;
+  $('soon').innerHTML = ends.length ? `<h2>قرّب يخلص ⏳</h2>` + ends.map((e) => `<div class="card req"><div class="row">
+      <div><b>${esc(e.c.name)}</b> · ${e.what}
+        <div class="meta" style="color:${e.n < 0 ? 'var(--red)' : e.n <= 2 ? '#B7791F' : 'inherit'}">${e.n < 0 ? `خلصت من ${-e.n} يوم` : e.n === 0 ? 'تخلص اليوم' : `باقي ${e.n} يوم`} · ${date(e.d)}</div></div>
+      ${e.c.owner_phone ? `<a href="${wa(e.c.owner_phone, remindTxt(e))}" target="_blank"><button class="teal" style="flex:0 0 auto">ذكّره</button></a>` : ''}
+      <a href="#c-${e.c.id}"><button class="soft" style="flex:0 0 auto">الكرت</button></a></div></div>`).join('') : '';
 
   const groups = {}; cafes.forEach((c) => { if (c.owner_group) (groups[c.owner_group] ||= []).push(c.name); });
   $('list').innerHTML = cafes.map((c) => {
